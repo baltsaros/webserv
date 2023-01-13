@@ -5,6 +5,18 @@
 #include <unistd.h>
 #include <string.h>
 
+/*
+	This code creates a socket using getaddrinfo to resolve the address 
+	and port, bind it and set it to listen on the specified address and port. 
+	Then it creates an epoll file descriptor and adds the listening socket to it.
+	The infinite while loop uses epoll_wait to wait for events on the file 
+	descriptor. When an event occurs, the code checks if the event is on the 
+	listening socket, and if it is, it accepts the connection and adds the 
+	new client socket to the epoll set. If the event is on a client socket, 
+	it calls the handle_request function which reads the request, 
+	checks if it's a GET request and sends back the appropriate response.
+*/
+
 const int MAX_EVENTS = 10;
 const int PORT = 8080;
 const char* ADDRESS = "0.0.0.0";
