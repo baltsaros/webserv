@@ -1,0 +1,50 @@
+# This configuration file sets the number of worker processes to 4, 
+# specifies the location of the error and access logs, 
+# and defines a server block for the domain example.com. 
+# In this block, it specifies that it should listen on port 80, 
+# and defines the root directory for the server to be /var/www/example.com. 
+# It also sets up locations for handling requests for the root directory, static files, 404 errors and 50x errors.
+# It's worth noting that this is a simple example, git
+# and actual nginx config may include more complex configuration such as SSL, proxy pass, load balancing, etc.
+
+# This is a basic nginx configuration file
+
+# specify the number of worker processes
+worker_processes 4;
+
+# specify the location of the error logs
+error_log /var/log/nginx/error.log;
+
+# specify the location and format of the access logs
+access_log /var/log/nginx/access.log;
+
+# define a server block for example.com
+server {
+    listen 80;
+    server_name example.com;
+
+    # define the location of the root directory
+    root /var/www/example.com;
+
+    # handle requests for the root directory
+    location / {
+        index index.html index.htm;
+    }
+
+    # handle requests for static files
+    location ~* \.(jpg|jpeg|png|gif|css|js)$ {
+        expires 30d;
+    }
+
+    # handle 404 errors
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
+    }
+
+    # handle 50x errors
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        internal;
+    }
+}
