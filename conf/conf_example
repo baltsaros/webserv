@@ -1,4 +1,26 @@
-// list of accepted HTTP methods for the route (GET, POST, DELETE)
+/*
+	list of accepted HTTP methods for the route (GET, POST, DELETE)
+
+	In an Nginx configuration file, 
+	the accepted HTTP methods can be listed using the "allow" directive within a "location" block. 
+	For example, to only allow GET and POST requests, the configuration would look like this:
+
+		location / {
+			allow GET;
+			allow POST;
+			deny all;
+		}
+
+	This allows GET and POST requests to be accepted at the specified location, and denies all other requests.
+
+	Alternatively, you can use the "if" statement to check the $request_method variable and limit the methods accepted by the server.
+
+		if ($request_method !~ ^(GET|HEAD|POST)$ ) {
+			return 405;
+		}
+
+	This will return a HTTP status code 405(Method Not Allowed) if the request method is not GET,HEAD or POST.
+*/ 
 
 /*
 	HTTP redirection -> error pages
@@ -15,4 +37,45 @@
 
 	rewrite ^/images/(.*)$ https://images.example.com/$1 redirect;
 	rewrite ^/images/(.*)$ https://images.example.com/$1 permanent;
+
+	#########################
+
+	In Nginx, HTTP redirection is typically achieved using the "rewrite" directive. 
+	This directive can be used to redirect clients to a different URL or to a different location on the server. 
+	The basic syntax for a redirect using the "rewrite" directive is as follows:
+
+		rewrite <old_uri> <new_uri> <http_response_code>;
+
+	- <old_uri> is the URL that the client requested.
+	- <new_uri> is the URL that the client should be redirected to.
+	- <http_response_code> is the HTTP response code that should be sent to the client. 
+		Common codes used for redirection are 301 (permanent redirect) or 302 (temporary redirect).
+	
+	For example, to redirect all requests for http://example.com/old to http://example.com/new, you would use the following configuration:
+
+		server {
+			listen 80;
+			server_name example.com;
+
+			location /old {
+				rewrite /old /new permanent;
+			}
+		}
+
+	Another way to achieve redirections is by using the return statement. 
+	For example, to redirect all requests for http://example.com/old to http://example.com/new, you would use the following configuration:
+
+		server {
+			listen 80;
+			server_name example.com;
+
+			location /old {
+				return 301 /new;
+			}
+		}
+
+	In this case, you don't need to specify the http_response_code as return statement automatically uses 301 (permanent redirect) as default.
+	It is worth noting that you can also use regular expressions with the "rewrite" 
+	directive to match multiple URIs and redirect them to a specific location.
+	Also, you can use different types of redirection like "alias", "return" and "proxy_pass" as per your requirement.
 */
