@@ -15,7 +15,7 @@ Questions
 		- ROUTES (?)
 
 		Not sure where this goes	
-		Methods
+		Methods (more detailed info below)
 		- GET
 		- POST
 		- DELETE
@@ -47,3 +47,18 @@ Questions
 3. STATIC WEB PAGE
 	* Code HTML basic web page, stored locally
 	* Code default error pages
+
+
+# METHODS #
+
+## GET
+
+The HTTP GET method is used to retrieve data from a server. It requests a specific resource from the server, such as a web page or image, and the server responds with the requested resource. GET requests are typically used to retrieve information from a server, while other methods such as POST, PUT, and DELETE are used to modify data on the server. GET requests are also used to retrieve data in a form that can be cached by the client, such as HTML pages or images.
+
+## POST
+
+The HTTP POST method is used to submit data to a server for further processing. It is typically used to send data to the server that the server should process and store, such as when submitting a form or uploading a file. The data sent in a POST request is placed in the message body of the HTTP request, rather than in the URL like a GET request. POST requests are not typically cached by clients, as the data sent in a POST request is usually intended to be stored on the server. This is in contrast to GET requests, which are used to retrieve data from the server and are often cached by clients.
+
+# DELETE
+
+The HTTP DELETE method is used to delete a resource from a server. It requests that the server delete a specific resource, such as a file or database record. The server then processes the request and deletes the specified resource. The DELETE method is typically used to delete a specific resource, rather than to delete all resources or a group of resources. It is often used in combination with the resource URI, which specifies the location of the resource to be deleted. Like other methods, DELETE requests are usually accompanied by a request header that contains additional information about the client, the request, or the resource being requested.

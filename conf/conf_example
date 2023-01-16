@@ -1,0 +1,18 @@
+// list of accepted HTTP methods for the route (GET, POST, DELETE)
+
+/*
+	HTTP redirection -> error pages
+
+	In Nginx, you create a specific server block for the content you want to redirect:
+
+	server {
+		listen 80;
+		server_name example.com;
+		return 301 $scheme://www.example.com$request_uri;
+	}
+	
+	To apply a redirect to a directory or only certain pages, use the rewrite directive:
+
+	rewrite ^/images/(.*)$ https://images.example.com/$1 redirect;
+	rewrite ^/images/(.*)$ https://images.example.com/$1 permanent;
+*/

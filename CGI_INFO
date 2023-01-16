@@ -1,0 +1,60 @@
+# CGI stands for Common Gateway Interface. It is a standard for running scripts on a web server to produce dynamic web pages. 
+# It allows a server-side  script to process user input and generate a response, which can be displayed in a user's web browser. 
+# CGI scripts can be written in a variety of programming languages, such as Perl, Python, and C.
+
+NGINX, a popular web server software, can use CGI to process dynamic web pages by executing scripts written in various programming languages. To use CGI with NGINX, you need to configure the server to pass certain types of requests to a CGI script. This is typically done using location blocks in the NGINX configuration file, which specify the URL path or pattern that should be matched, and the script that should be executed for those requests.
+
+For example, you might configure NGINX to pass all requests for URLs that end in ".cgi" or ".pl" to a script interpreter, such as Perl or Python, like this:
+
+location ~ \.pl$ {
+  gzip off;
+  include fastcgi_params;
+  fastcgi_pass unix:/var/run/fcgiwrap.socket;
+  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+}
+
+This configuration would tell NGINX to use the FastCGI protocol to pass requests for URLs ending in ".pl" to a FastCGI server listening on a UNIX domain socket, and to use the script file name specified in the SCRIPT_FILENAME parameter as the script to execute.
+
+In addition to this, you will also need to make sure that the scripts are placed in a location that is accessible by the web server and that the scripts have the proper permissions to execute.
+
+Overall, using CGI with NGINX requires some setup and configuration, but it can provide a powerful and flexible way to generate dynamic web pages on a web server.
+
+# Basic python CGI script
+
+Here's an example of a simple Python CGI script that can be used with a web server like NGINX:
+
+	#!/usr/bin/env python
+
+	import cgi
+
+	print("Content-type: text/html\n")
+
+	form = cgi.FieldStorage()
+
+	name = form.getvalue("name")
+
+	print("<html>")
+	print("<head>")
+	print("<title>Hello, CGI!</title>")
+	print("</head>")
+	print("<body>")
+	print("<h1>Hello, " + name + "!</h1>")
+	print("</body>")
+	print("</html>")
+
+This script uses the cgi module in Python to parse the form data from an HTML form. It gets the value of a field named "name" from the form data and includes it in the response that is sent back to the browser.
+
+When executed by a web server, this script will output an HTML page that displays "Hello, {name}!" where {name} is the value entered in the form.
+
+You'll need to configure your web server to handle CGI scripts. In the case of nginx, you can configure a location block to handle requests that match a specific URL pattern and pass them to the script interpreter.
+
+	location ~ \.py$ {
+	gzip off;
+	include fastcgi_params;
+	fastcgi_pass unix:/var/run/fcgiwrap.socket;
+	fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+	}
+
+This configuration tells NGINX to use the FastCGI protocol to pass requests for URLs ending in ".py" to a FastCGI server listening on a UNIX domain socket, and to use the script file name specified in the SCRIPT_FILENAME parameter as the script to execute.
+
+Keep in mind that this is a very basic example and a real world implementation would have more robust error handling and security measures in place.
