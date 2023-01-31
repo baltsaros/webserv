@@ -62,3 +62,6 @@ The HTTP POST method is used to submit data to a server for further processing. 
 # DELETE
 
 The HTTP DELETE method is used to delete a resource from a server. It requests that the server delete a specific resource, such as a file or database record. The server then processes the request and deletes the specified resource. The DELETE method is typically used to delete a specific resource, rather than to delete all resources or a group of resources. It is often used in combination with the resource URI, which specifies the location of the resource to be deleted. Like other methods, DELETE requests are usually accompanied by a request header that contains additional information about the client, the request, or the resource being requested.
+
+## Directory listing
+https://portswigger.net/kb/issues/00600100_directory-listing
