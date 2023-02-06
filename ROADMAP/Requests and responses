@@ -1,0 +1,113 @@
+##### IMPLEMENTING REQUESTS AND RESPONSES #####
+
+A client request to a web server typically consists of the following components:
+
+1. Request method: Specifies the type of request being made, such as GET, POST, PUT, DELETE, etc.
+2. Request URL: Specifies the location of the resource being requested on the server.
+3. Request headers: Additional information about the request, such as the type of content being sent or requested, the user agent, the referrer, etc.
+4. Request body (optional): Contains data to be sent to the server in cases such as POST requests.
+
+### EXAMPLES ###
+## GET ##
+The HTTP GET method is used to retrieve data from a server. It requests a specific resource from the server, such as a web page or image, and the server responds with the requested resource. GET requests are typically used to retrieve information from a server, while other methods such as POST, PUT, and DELETE are used to modify data on the server. GET requests are also used to retrieve data in a form that can be cached by the client, such as HTML pages or images.
+
+# Request
+GET /api/users/1 HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Accept: application/json
+
+# Response
+HTTP/1.1 200 OK
+Server: Apache/2.4.38 (Debian)
+Date: Tue, 01 Mar 2022 21:50:11 GMT
+Content-Type: application/json
+Content-Length: 88
+
+{
+    "id": 1,
+    "username": "jane",
+    "email": "jane@example.com",
+    "created_at": "2022-02-28T19:23:15Z"
+}
+
+## POST ##
+The HTTP POST method is used to submit data to a server for further processing. It is typically used to send data to the server that the server should process and store, such as when submitting a form or uploading a file. The data sent in a POST request is placed in the message body of the HTTP request, rather than in the URL like a GET request. POST requests are not typically cached by clients, as the data sent in a POST request is usually intended to be stored on the server. This is in contrast to GET requests, which are used to retrieve data from the server and are often cached by clients.
+
+# Request
+POST /api/users HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Content-Type: application/json
+Content-Length: 42
+
+{
+    "username": "john",
+    "email": "john@example.com"
+}
+
+# Response
+HTTP/1.1 201 Created
+Server: Apache/2.4.38 (Debian)
+Date: Tue, 01 Mar 2022 21:50:11 GMT
+Content-Type: application/json
+Content-Length: 33
+Location: /api/users/2
+
+{
+    "id": 2,
+    "username": "john",
+    "email": "john@example.com"
+}
+
+## DELETE ##
+The HTTP DELETE method is used to delete a resource from a server. It requests that the server delete a specific resource, such as a file or database record. The server then processes the request and deletes the specified resource. The DELETE method is typically used to delete a specific resource, rather than to delete all resources or a group of resources. It is often used in combination with the resource URI, which specifies the location of the resource to be deleted. Like other methods, DELETE requests are usually accompanied by a request header that contains additional information about the client, the request, or the resource being requested.
+
+# Request
+DELETE /api/users/1 HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+
+# Response
+HTTP/1.1 204 No Content
+Server: Apache/2.4.38 (Debian)
+Date: Tue, 01 Mar 2022 21:50:11 GMT
+
+# Requests:
+In these examples, the User-Agent, Accept-Language, Accept-Encoding, and Connection headers provide information about the client, such as the type of client software and preferred language, encoding, and connection behavior. The Accept header in the GET request indicates the desired format of the response. The Content-Type header in the POST request indicates the format of the request body, and the Content-Length header indicates the length of the request body in bytes.
+# Responses:
+In these examples, the HTTP/1.1 line indicates the HTTP version and the status code of the response. The Server header provides information about the server software, the Date header indicates the time the response was generated, and the Content-Type header indicates the format of the response body. The Content-Length header indicates the length of the response body in bytes, and the Location header in the POST response gives the location of the newly created resource. The 204 No Content status code in the DELETE response indicates that the resource was successfully deleted, but no response body is included.
+
+################################
+
+# Reading request:
+# Using recv(), we have to specify a number of bytes to read. We use something similar to GNL to join the received chunks to formulate the entire request.
+
+- A web server that uses the recv function to receive requests in chunks can determine when it has received the entirety of the request by checking for the presence of the \r\n\r\n sequence in the received data, which indicates the end of the HTTP headers.
+
+For example, the server can keep a buffer of the received data and concatenate new chunks of data as they arrive. When a chunk of data containing the \r\n\r\n sequence is received, the server can split the buffer into two parts: the headers and the body. The headers can then be parsed to determine the length of the request body, if any. If the body is present, the server can continue to receive data until it has received the specified number of bytes.
+
+It is important to note that the recv function may return fewer bytes than requested, so the server should be prepared to handle partial data and concatenate it with the next chunk until the complete request is received.
+
+# Writing response
+- We should handle all error cases
+- I don't know if we should handle sending chunked responses. 
+Why a server would do so:
+1. To reduce memory usage: By sending the response in chunks, the server can reduce the amount of memory it needs to buffer the entire response. This is especially useful for handling large responses, such as large files or dynamic content generated on the fly.
+
+2. To improve response time: By sending the response in chunks, the server can start sending data to the client as soon as it becomes available, rather than having to wait for the entire response to be generated. This can improve the overall response time for the client, as it will start receiving data sooner.
+
+3. To handle dynamic content: In some cases, the server might not know the complete size of the response until it has been generated. For example, the response might be generated dynamically based on user input or database queries. In such cases, chunked responses can be used to send the response in a streamed fashion, allowing the client to start receiving data before the entire response has been generated.
+
+Overall, chunked responses can improve the scalability, performance, and efficiency of web servers, and are a useful feature of the HTTP/1.1 protocol.
+
+##################################

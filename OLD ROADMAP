@@ -1,0 +1,53 @@
+Questions
+	* What are headers? Where do we use them ?
+		(We will consider that NGINX is HTTP 1.1 compliant and may be used to compare
+		 HEADERS and answer behaviors)
+	* CGI ? How and where is it used ?
+	* How do we bounce a client properly?
+
+1. CONFIGURATION
+
+	* Write conf file
+		CFR "server" from NGINX
+		- choose host:port of server + set as default for next requests from said server
+		- server_name + default
+		- limit client body size
+		- ROUTES (?)
+
+		Not sure where this goes	
+		Methods (more detailed info below)
+		- GET
+		- POST
+		- DELETE
+
+	* Parse conf file
+
+2. WEB SERVER
+	* Request (client to server)
+		- Can't hang, must have a timeout
+	* Response (server to client)
+		- sends HTTP response status code
+	
+	* Connexion
+		- Choice between select, poll, epoll, kqueue. 
+			. CWASTCHE OPINION: epoll. a bit harder to use but 1000x faster
+		
+		- main loop
+			. getaddrinfo()	
+			. socket() -> fd of socket
+			. setsockopt() ? (Used to set options to socket. Not sure if needed)
+			. bind()
+			. listen()
+				What if multiple connexions? loop all the above?
+		
+		- fcntl(fd, F_SETFL, O_NONBLOCK) -> given fd socket becomes non-blocking.
+		  We then use epoll to check if socket is ready for I/O operation
+
+
+3. STATIC WEB PAGE
+	* Code HTML basic web page, stored locally
+	* Code default error pages
+
+
+## Directory listing
+https://portswigger.net/kb/issues/00600100_directory-listing
