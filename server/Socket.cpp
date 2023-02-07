@@ -3,16 +3,22 @@
 // Default constructor
 ws::Socket::Socket(int domain, int service, int protocol, int port,
 					u_long interface, int backlog) {
+	int	ret;
+	int	on = 1;
+
 	// Setting server parameters
 	_address.sin_family = domain;
 	_address.sin_port = htons(port);
 	_address.sin_addr.s_addr = htonl(interface);
-	_address.sin_addr.s_addr = INADDR_ANY;
+	// _address.sin_addr.s_addr = INADDR_ANY;
 
 	// Creating endpoint for communication
 	_sockfd = socket(domain, service, protocol);
 	test_connection(_sockfd);
 	_backlog = backlog;
+	// Allow _sockfd to be reusable
+	ret = setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
+	test_connection(ret);
 	connect_to_network();
 	return ;
 }
