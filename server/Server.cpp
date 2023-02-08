@@ -34,15 +34,19 @@ void	ws::Server::accepter() {
 void	ws::Server::handler() {
 	std::cout << "Reading" << std::endl;
 	ssize_t	valread = recv(_sockfd, _buf, sizeof(_buf), 0);
-	test_connection(valread);
+	// test_connection(valread); // exits because of fcntl
+	if (!valread) {
+		std::cout << "Server was shut down" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	std::cout << _buf << std::endl;
 }
 
 // Send a response back
 void	ws::Server::responder() {
 	std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ";
-	std::string	msg = "Hello from the Server!";
-	// std::string	msg = "Testing";
+	// std::string	msg = "Hello from the Server!";
+	std::string	msg = "Testing";
 	std::string	to_send;
 	int			ret;
 
@@ -52,13 +56,13 @@ void	ws::Server::responder() {
 	ret = send(_sockfd, to_send.c_str(), to_send.size(), 0);
 	// std::cout << to_send << std::endl;
 	test_connection(ret);
-	// close(_sockfd);
 }
 
 void	ws::Server::launcher() {
 	int	ret;
 
 	while (19) {
+		// select() erases used fd from a set; so we need to use a copy of our original set
 		_working_set = _master_set;
 		ret = select(_max_sd + 1, &_working_set, NULL, NULL, &_timeout);
 		test_connection(ret);

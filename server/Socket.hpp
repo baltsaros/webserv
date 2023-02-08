@@ -4,6 +4,7 @@
 # include <netinet/in.h> // some macros for socket
 # include <netdb.h> // getaddrinfo
 # include <string.h> // strerror
+# include <fcntl.h>
 # include <iostream>
 
 namespace	ws {

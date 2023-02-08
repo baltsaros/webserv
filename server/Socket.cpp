@@ -19,6 +19,9 @@ ws::Socket::Socket(int domain, int service, int protocol, int port,
 	// Allow _sockfd to be reusable
 	ret = setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
 	test_connection(ret);
+	// Make the socket non blocking
+	ret = fcntl(_sockfd, F_SETFL, O_NONBLOCK);
+	test_connection(ret);
 	connect_to_network();
 	return ;
 }
