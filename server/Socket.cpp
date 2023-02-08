@@ -33,6 +33,11 @@ void	ws::Socket::connect_to_network(void) {
 	std::cout << "Listening" << std::endl;
 	ret = listen(_sockfd, _backlog);
 	test_connection(ret);
+	_max_sd = _sockfd;
+	// // Initialize set
+	// FD_ZERO(&_master_set);
+	// // Add a new socket to the set
+	// FD_SET(_sockfd, &_master_set);
 }
 
 // Check for errors; socket, bind and listen return -1 on error and set errno to the appropriate value
@@ -44,10 +49,18 @@ void	ws::Socket::test_connection(int to_test) {
 }
 
 // Getters
-struct sockaddr_in	ws::Socket::get_address() {
+struct sockaddr_in	ws::Socket::get_address() const {
 	return (_address);
 }
 
-int	ws::Socket::get_socket() {
+int	ws::Socket::get_socket() const {
 	return (_sockfd);
 }
+
+int	ws::Socket::get_maxsd() const {
+	return (_max_sd);
+}
+
+// fd_set	ws::Socket::get_masterset() const {
+// 	return (_master_set);
+// }

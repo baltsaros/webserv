@@ -10,9 +10,10 @@ namespace	ws {
 
 class Socket {
 	private:
-		int					_sockfd;
+		int					_sockfd, _max_sd;
 		int					_backlog;
 		struct sockaddr_in	_address;
+		// fd_set				_master_set;
 
 	public:
 		Socket() {}
@@ -22,8 +23,10 @@ class Socket {
 
 		void				connect_to_network();
 		void				test_connection(int to_test);
-		struct sockaddr_in	get_address();
-		int					get_socket();
+		struct sockaddr_in	get_address() const;
+		int					get_socket() const;
+		int					get_maxsd() const;
+		// fd_set				get_masterset() const;
 };
 
 }

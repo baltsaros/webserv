@@ -47,7 +47,10 @@ fclean:		clean
 
 re:			fclean all
 
+run:	all
+			@./webserv
+
 val:		${NAME}
 			valgrind --leak-check=full ./$(NAME)
 
-.PHONY:		all clean fclean re val
+.PHONY:		all clean fclean re val run
