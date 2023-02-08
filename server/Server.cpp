@@ -62,7 +62,7 @@ void	ws::Server::launcher() {
 	int	ret;
 
 	while (19) {
-		// select() erases used fd from a set; so we need to use a copy of our original set
+		// Select() erases used fd from a set; so we need to use a copy of our original set
 		_working_set = _master_set;
 		ret = select(_max_sd + 1, &_working_set, NULL, NULL, &_timeout);
 		test_connection(ret);
@@ -79,7 +79,7 @@ void	ws::Server::launcher() {
 						_max_sd = _sockfd;
 					responder();
 				}
-				else { // if it is not server socket; just read it and clear it from the set
+				else { // If it is not server socket; just read it and clear it from the set
 					handler();
 					FD_CLR(i, &_working_set);
 				}
