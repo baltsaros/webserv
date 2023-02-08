@@ -32,11 +32,16 @@ void	ws::Server::handler() {
 
 // Send a responce back
 void	ws::Server::responder() {
-	// std::string	msg = "Hello from server";
-	std::string	msg = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+	std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ";
+	std::string	msg = "Testing";
+	std::string	to_send;
 	int			ret;
 
-	ret = send(_sockfd, msg.c_str(), msg.size(), 0);
+	to_send = header + std::to_string(msg.size());
+	to_send += "\r\n\r\n";
+	to_send += msg;
+	ret = send(_sockfd, to_send.c_str(), to_send.size(), 0);
+	std::cout << to_send << std::endl;
 	test_connection(ret);
 	close(_sockfd);
 }
