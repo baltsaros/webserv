@@ -1,0 +1,27 @@
+##### HTTP 1.1 #####
+
+A web server must implement the following features in order to fully comply with the HTTP/1.1 specification:
+
+1. Persistent Connections: HTTP/1.1 supports persistent connections, allowing multiple requests to be sent over a single connection. 
+   The server must implement this feature to fully support HTTP/1.1.
+
+2. Improved Header Fields: HTTP/1.1 provides more header fields, allowing more information to be sent with each request. 
+   The server must implement these additional header fields to be fully HTTP/1.1 compliant.
+
+3. Host Header Field: HTTP/1.1 requires the use of the "Host" header field in all requests, 
+   which indicates the domain name of the server being requested. The server must implement this header field to be fully HTTP/1.1 compliant.
+
+4. Chunked Transfers: HTTP/1.1 supports chunked transfers, which allow data to be sent in chunks, rather than all at once. 
+   The server must implement this feature to fully support HTTP/1.1.
+
+5. Content Negotiation: HTTP/1.1 introduces content negotiation, 
+   which allows the server to return different versions of a resource based on the client's preferences. 
+   The server must implement this feature to fully support HTTP/1.1.
+
+6. Conditional Requests: HTTP/1.1 also introduces conditional requests, 
+   which allow clients to request only the parts of a resource that have changed since a previous request. 
+   The server must implement this feature to fully support HTTP/1.1.
+
+7. Cache Control: HTTP/1.1 introduces cache control mechanisms, 
+   which allow the server to specify how a resource should be cached by the client or intermediate proxies. 
+   The server must implement these mechanisms to be fully HTTP/1.1 compliant.
