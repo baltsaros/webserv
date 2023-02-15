@@ -1,7 +1,7 @@
 #include "Client.hpp"
 
 // Hardcoded info, to be delevoped
-Client::Client()
+Client::Client(const std::string& host, const std::string& port, const std::string& request)
 	: _host(host), _port(port), _request(request)
 {}
 
