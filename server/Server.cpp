@@ -27,19 +27,30 @@ void	ws::Server::accepter() {
 
 	_sockfd = accept(_socket->get_socket(), (struct sockaddr *)&address,
 			(socklen_t *)&addrlen);
-	test_connection(_sockfd);
+	if (_sockfd == -1 && errno == EAGAIN)
+		return;
+	if (_sockfd == -1)
+		test_connection(_sockfd);
 }
 
 // Print the received message
 void	ws::Server::handler() {
 	std::cout << "Reading" << std::endl;
-	ssize_t	valread = recv(_sockfd, _buf, sizeof(_buf), 0);
-	// test_connection(valread); // exits because of fcntl
-	if (!valread) {
-		std::cout << "Server was shut down" << std::endl;
-		exit(EXIT_FAILURE);
+	ssize_t	valread = recv(_sockfd, _buf, sizeof(_buf), MSG_DONTWAIT);
+	// With MSG_DONTWAIT recv won't block socket if there is nothing to read
+	if (valread == -1 && errno == EAGAIN)
+		return ;
+	if (valread == -1) {
+		test_connection(valread);
+		return ;
 	}
-	std::cout << _buf << std::endl;
+	if (valread == 0) {
+		std::cout << "Server was shut down" << std::endl;
+		close(_sockfd);
+		return ;
+	}
+	if (_buf)
+		std::cout << _buf << std::endl;
 }
 
 // Send a response back
@@ -55,7 +66,13 @@ void	ws::Server::responder() {
 	to_send += msg;
 	ret = send(_sockfd, to_send.c_str(), to_send.size(), 0);
 	// std::cout << to_send << std::endl;
-	test_connection(ret);
+	if (ret == -1 && errno == EAGAIN) {
+		return ;
+	}
+	else if (ret == -1) {
+		test_connection(ret);
+		return ;
+	}
 }
 
 void	ws::Server::launcher() {
@@ -65,7 +82,12 @@ void	ws::Server::launcher() {
 		// Select() erases used fd from a set; so we need to use a copy of our original set
 		_working_set = _master_set;
 		ret = select(_max_sd + 1, &_working_set, NULL, NULL, &_timeout);
-		test_connection(ret);
+		if (ret == -1)
+			test_connection(ret);
+		if (ret == 0) {
+			std::cout << "Timeout" << std::endl;
+			break ;
+		}
 		// Check what fd is ready for connection
 		std::cout << "==== WAITING ====" << std::endl;
 		for (int i = 0; i <= _max_sd; ++i) {
@@ -96,10 +118,11 @@ void	ws::Server::launcher() {
 
 // Check for errors; accept, send, recv return -1 on error and set errno to the appropriate value
 void	ws::Server::test_connection(int to_test) {
-	if (to_test < 0) {
-		std::cout << "Webserver error: " << strerror(to_test) << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	std::cout << "Webserver error: " << strerror(to_test) << std::endl;
+	// if (to_test < 0) {
+		// std::cout << "Webserver error: " << strerror(to_test) << std::endl;
+		// exit(EXIT_FAILURE);
+	// }
 }
 
 // Getters
