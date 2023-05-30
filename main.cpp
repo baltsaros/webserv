@@ -10,7 +10,10 @@ int	main(int argc, char **argv) {
 		return 1;
 	}
 	std::cout << "argv: " << argv[1] << std::endl;
-	Configuration	s1(argv[1]);
+	Configuration	config(argv[1]);
+
+	// ws::Server  s1(AF_INET, SOCK_STREAM, 0, _port, INADDR_ANY, 32);
+    // s1.launcher();
 
 	return (0);
 }
