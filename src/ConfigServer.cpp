@@ -4,13 +4,13 @@ ConfigServer::ConfigServer(std::string & content) {
 
 	createServerBlocks(content);
 	parseServer();
-	// std::cout << "=============START SERVER===============\n";
-	// printVector(this->_ports);
-	// std::cout << this->_host << "\n";
-	// printVector(this->_serverNames);
-	// std::cout << this->_clientMaxBodySize << "\n";
-	// printMap(this->_errorPages);
-	// std::cout << "==============END SERVER================\n";
+	std::cout << "=============START SERVER===============\n";
+	printVector(this->_ports);
+	std::cout << this->_host << "\n";
+	printVector(this->_serverNames);
+	std::cout << this->_clientMaxBodySize << "\n";
+	printMap(this->_errorPages);
+	std::cout << "==============END SERVER================\n";
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {
@@ -60,8 +60,20 @@ an int.
 
 void	ConfigServer::parseListen(std::pair<std::string, std::string> &pair) {
 
-	// check format
-	this->_ports.push_back(stoi(pair.second));
+	int	port;
+	
+	for (size_t i = 0; i < pair.second.length(); i++) {
+		if (!isdigit(pair.second[i])) {
+			std::cout << "Error: problem with port format.\n";
+			exit (EXIT_FAILURE);
+		}
+	}
+	port = stoi(pair.second);
+	if (port > 65535 || port < 1) {
+			std::cout << "Error: problem with port format.\n";
+			exit (EXIT_FAILURE);
+	}
+	this->_ports.push_back(port);
 }
 
 /*

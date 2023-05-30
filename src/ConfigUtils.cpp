@@ -15,17 +15,17 @@ std::list<std::pair<std::string, std::string> >	parseBlock(std::string &content)
 	std::string										buffer;
 	size_t											pos1, pos2;
 
-	getline(ss, buffer, '\n');							// just reads the first line
-	while (getline(ss, buffer, '\n')) {
+	getline(ss, buffer);							// just reads the first line
+	while (getline(ss, buffer)) {
 		if (buffer.empty())
 			continue ;
-		while (buffer[0] == '\t')
+		while (buffer[0] == CHAR_TAB)
 			buffer.erase(0, 1);
-		if (!buffer.compare("}"))
+		if (!buffer.compare(CLOSING_BRACE))
 			continue ;
-		pos1 = buffer.find(' ');
+		pos1 = buffer.find(CHAR_SPACE);
 		pair.first = buffer.substr(0, pos1);
-		pos2 = buffer.find(';');
+		pos2 = buffer.find(CHAR_SEMI_COLON);
 		pair.second = buffer.substr(pos1 + 1, pos2 - pos1 - 1);
 		list.push_back(pair);
 	}
@@ -33,7 +33,6 @@ std::list<std::pair<std::string, std::string> >	parseBlock(std::string &content)
 	// 	std::cout << "First: " << (*it).first << ", second; " << (*it).second << std::endl;
 	return (list);
 }
-
 
 void	printMap(std::map<int, std::string> map) {
 

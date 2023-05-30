@@ -8,6 +8,11 @@
 # include <vector>
 # include <map>
 
+# define CHAR_TAB			'\t'
+# define CHAR_SPACE			' '
+# define CHAR_SEMI_COLON	';'
+# define CLOSING_BRACE	"}"
+
 template < typename T >
 void	printVector(std::vector<T> vector) {
 
