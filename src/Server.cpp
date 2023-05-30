@@ -141,7 +141,8 @@ void	ws::Server::launcher() {
 
 	while (19) {
 		// Select() erases used fd from a set; so we need to use a copy of our original set
-		_working_set = _master_set;
+		memcpy(&_working_set, &_master_set, sizeof(_master_set));
+		// _working_set = _master_set;
 		ret = select(_max_sd + 1, &_working_set, NULL, NULL, &_timeout);
 		if (ret == -1)
 			test_connection(ret);
@@ -155,7 +156,7 @@ void	ws::Server::launcher() {
 			if (FD_ISSET(i, &_working_set)) {
 				if (i == _socket->get_socket()) {
 					accepter();
-					FD_SET(_sockfd, &_working_set);
+					FD_SET(_sockfd, &_master_set);
 					std::cout << "max socket: " << _max_sd << std::endl;
 					std::cout << "server socket: " << _sockfd << std::endl;
 					if (_sockfd > _max_sd)
@@ -165,7 +166,7 @@ void	ws::Server::launcher() {
 				}
 				else { // If it is not server socket; just read it and clear it from the set
 					handler();
-					FD_CLR(i, &_working_set);
+					FD_CLR(i, &_master_set);
 				}
 			}
 		}
