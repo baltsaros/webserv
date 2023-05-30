@@ -17,11 +17,11 @@ class Server {
 		int			_sockfd, _max_sd;
 		char		_buf[30000];
 		fd_set		_working_set, _master_set;
-		void		accepter();
-		void		handler();
-		void		responder();
+		int			accepter();
+		int			handler(int i);
+		int			responder(int i);
 		std::string	read_file(const std::string& filename);
-		int			checkRequest();
+		int			checkRequest(int i);
 
 	public:
 		Server();

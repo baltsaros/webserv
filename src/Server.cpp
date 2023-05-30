@@ -40,70 +40,69 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 
 // Accept a connection on our socket and creates a new socket ft that is linked to the original one
 // Receive a message from the socket _sockfd
-void	ws::Server::accepter() {
+int		ws::Server::accepter() {
 	std::cout << "Accepting" << std::endl;
 	struct sockaddr_in	address = _socket->get_address();
 	int	addrlen = sizeof(address);
 
 	_sockfd = accept(_socket->get_socket(), (struct sockaddr *)&address,
 			(socklen_t *)&addrlen);
-	if (_sockfd == -1 && errno == EAGAIN)
-		return;
-	if (_sockfd == -1)
-		test_connection(_sockfd);
+	return _sockfd;
 }
 
 // Print the received message
-void	ws::Server::handler() {
+int		ws::Server::handler(int i) {
 	std::cout << "Reading" << std::endl;
-	ssize_t	valread = recv(_sockfd, _buf, sizeof(_buf), MSG_DONTWAIT);
+	memset(_buf, '\0', sizeof(_buf));
 	// With MSG_DONTWAIT recv won't block socket if there is nothing to read
-	if (valread == -1 && errno == EAGAIN)
-		return ;
+	ssize_t	valread = recv(i, _buf, sizeof(_buf), MSG_DONTWAIT);
+	// if (valread == -1 && errno != EWOULDBLOCK) {
+	// 	std::cerr << "Recv() error" << std::endl;
+	// 	return 0;
+	// }
+	// -1 means error; 0 - connection was closed by the client
 	if (valread == -1) {
-		test_connection(valread);
-		return ;
+		// test_connection(valread);
+		return -1;
 	}
-	if (valread == 0) {
-		std::cout << "Server was shut down" << std::endl;
-		close(_sockfd);
-		return ;
+	else if (valread == 0) {
+		std::cout << "Connection was closed" << std::endl;
+		return 0;
 	}
 	if (_buf) {
 		// std::cout << _buf << std::endl;
 		Request req(_buf);
 		_req = req;
 	}
+	return 1;
 }
 
 // Send a response back
-void	ws::Server::responder() {
+int		ws::Server::responder(int i) {
 	int			ret;
 	// std::cout << "code: " << _req.getErrorCode() << std::endl;
 	if (_req.getErrorCode() >= 0)
-		ret = checkRequest();
+		ret = checkRequest(i);
 	else {
 		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ";
-		std::string	msg = "Testing";
+		std::string	msg = "Testing\n";
 		std::string	response;
 
 		response = header + std::to_string(msg.size());
 		response += "\r\n\r\n";
 		response += msg;
-		ret = send(_sockfd, response.c_str(), response.size(), 0);
+		ret = send(i, response.c_str(), response.size(), 0);
 	}
 	// std::cout << to_send << std::endl;
-	if (ret == -1 && errno == EAGAIN) {
-		return ;
+	if (ret == -1) {
+		std::cerr << "Send() error" << std::endl;
+		return -1;
 	}
-	else if (ret == -1) {
-		test_connection(ret);
-		return ;
-	}
+	return ret;
 }
 
-// check for error code; had to use absolute path for errors;
-int		ws::Server::checkRequest() {
+// check for an error code and create an according response
+int		ws::Server::checkRequest(int i) {
 	int	errorCode = _req.getErrorCode();
 	int	ret = 0;
 	std::string error;
@@ -132,41 +131,91 @@ int		ws::Server::checkRequest() {
 	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
 	response += "\r\n";
 	response += error;
-	ret = send(_sockfd, response.c_str(), response.size(), 0);
+	ret = send(i, response.c_str(), response.size(), 0);
 	return (ret);
 }
 
 void	ws::Server::launcher() {
-	int	ret;
+	int		ret = 0, sds_ready = 0, new_sd = 0;
+	bool	end_server = false, close_conn = false;
 
-	while (19) {
-		// Select() erases used fd from a set; so we need to use a copy of our original set
+	while (!end_server) {
+		// Select() erases used fds from a set, so we need to use a copy of our original set
 		memcpy(&_working_set, &_master_set, sizeof(_master_set));
-		// _working_set = _master_set;
 		ret = select(_max_sd + 1, &_working_set, NULL, NULL, &_timeout);
-		if (ret == -1)
-			test_connection(ret);
-		if (ret == 0) {
+		// select() in this case returns the number of readable descriptors
+		// ret == -1 means an error; ret == 0 means timeout
+		if (ret == -1) {
+			std::cerr << "Select() Error" << std::endl;
+			break ;
+		}
+		else if (ret == 0) {
 			std::cout << "Timeout" << std::endl;
 			break ;
 		}
-		// Check what fd is ready for connection
+		sds_ready = ret;
 		std::cout << "==== WAITING ====" << std::endl;
-		for (int i = 0; i <= _max_sd; ++i) {
+		for (int i = 0; i <= _max_sd && sds_ready > 0; ++i) {
+			// Check what descriptor (socket) is ready for connection
 			if (FD_ISSET(i, &_working_set)) {
+				sds_ready -= 1;
+				// check if i is the listening socket
 				if (i == _socket->get_socket()) {
-					accepter();
-					FD_SET(_sockfd, &_master_set);
-					std::cout << "max socket: " << _max_sd << std::endl;
-					std::cout << "server socket: " << _sockfd << std::endl;
-					if (_sockfd > _max_sd)
-						_max_sd = _sockfd;
-					handler();
-					responder();
+					// if so, we need to accept all incoming connections
+					while (19) {
+						new_sd = accepter();
+						std::cout << "new_sd: " << new_sd << std::endl;
+						if (new_sd < 0) {
+							// EWOULDBLOCK in this case means that there are no more
+							// pending connections on the queue
+							if (errno != EWOULDBLOCK) {
+								std::cerr << "Accept() error" << std::endl;
+								end_server = true;
+							}
+							break ;
+						}
+						std::cout << "max socket: " << _max_sd << std::endl;
+						std::cout << "server socket: " << new_sd << std::endl;
+						// adding the new incoming connection to the master set
+						FD_SET(new_sd, &_master_set);
+						if (new_sd > _max_sd)
+							_max_sd = new_sd;
+						if (new_sd == -1)
+							break ;
+					}
 				}
-				else { // If it is not server socket; just read it and clear it from the set
-					handler();
-					FD_CLR(i, &_master_set);
+				else { 
+					// if it is not a listnening socket, we don't need to accept
+					// an incoming connection. The existing connections is readable
+					close_conn = false;
+					while (19) {
+						// receive all incoming data
+						ret = handler(i);
+						if (!ret) {
+							close_conn = true;
+							break ;
+						}
+						else if (ret == -1)
+							break ;
+						// send response back to the client
+						ret = responder(i);
+						if (ret == -1) {
+							close_conn = true;
+							break ;
+						}
+					}
+					// if close_conn flag was turned on (recv/send errors)
+					// we need to close the active connection,
+					// remove it from the master_set and decrease the value of
+					// max socket in the master set
+					if (close_conn) {
+						close(i);
+						FD_CLR(i, &_master_set);
+						if (i == _max_sd) {
+							while (!FD_ISSET(_max_sd, &_master_set))
+								_max_sd -= 1;
+						}
+					}
 				}
 			}
 		}
