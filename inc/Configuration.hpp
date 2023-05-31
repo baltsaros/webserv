@@ -6,7 +6,7 @@
 /*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:14:14 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/05/30 16:00:51 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/05/31 10:24:48 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@
 # include <vector>
 # include "ConfigServer.hpp"
 
-# define SERVER_START	"server {"
+# define START_SERVER_BLOCK	"server {"
 # define END_SERVER_BLOCK	"\n}"
 
-class Server;
+class ConfigServer;
 
 class Configuration {
 	
@@ -37,12 +37,12 @@ class Configuration {
 		void	parseConfig();
 
 		Configuration(); 
+		
 	public:
 		Configuration(std::string const & path);
 		~Configuration();
 
-		Server const	& getServer(int i);
-
+		ConfigServer	getConfigServer(int i) const;
 };
 
 #endif

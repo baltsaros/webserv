@@ -6,7 +6,7 @@
 /*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/05/30 16:00:44 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/05/31 10:24:44 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	Configuration::createConfigBlocks(std::string const & path) {
 	}
 	std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 	while (posb != std::string::npos) {
-		posb = content.find(SERVER_START, posb);
+		posb = content.find(START_SERVER_BLOCK, posb);
 		pose = content.find(END_SERVER_BLOCK, posb);
 		if (posb < content.length() && pose << content.length()) {
 			this->_configBlocks.push_back(content.substr(posb, pose + 2 - posb));
@@ -67,4 +67,9 @@ void	Configuration::parseConfig() {
 	for (int i = 0; i < this->_configBlocks.size(); i++) {
 		this->_vectServers.push_back(ConfigServer(this->_configBlocks[i]));
 	}
+}
+
+ConfigServer	Configuration::getConfigServer(int i) const {
+	
+	return (this->_vectServers[i]);
 }
