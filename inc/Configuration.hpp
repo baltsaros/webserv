@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abuzdin <abuzdin@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:14:14 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 11:48:51 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/06/01 11:55:57 by abuzdin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ class Configuration {
 		void	createConfigBlocks(std::string const & path);
 		void	parseConfig();
 
-		Configuration(); 
 		
 	public:
+		Configuration(); 
 		Configuration(std::string const & path);
 		Configuration(Configuration const & src);
 		~Configuration();

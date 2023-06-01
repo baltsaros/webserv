@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
+/*   By: abuzdin <abuzdin@student.s19.be>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 11:51:36 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/06/01 11:58:45 by abuzdin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Configuration.hpp"
 
+
+Configuration::Configuration()
+{
+}
 
 Configuration::Configuration(std::string const & path) {
 	createConfigBlocks(path);
