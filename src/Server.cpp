@@ -112,19 +112,19 @@ int		ws::Server::checkRequest(int i) {
 	std::string response;
 	switch (errorCode) {
 		case 0:
-			error = read_file("web/error_pages/400.html");
+			error = read_file("website/error_pages/400.html");
 			response = "HTTP/1.1 400 Bad Request\r\n";
 			break;
 		case 3:
-			error = read_file("web/error_pages/403.html");
+			error = read_file("website/error_pages/403.html");
 			response = "HTTP/1.1 403 Forbidden\r\n";
 			break;
 		case 4:
-			error = read_file("web/error_pages/404.html");
+			error = read_file("website/error_pages/404.html");
 			response = "HTTP/1.1 404 Not Found\r\n";
 			break;
 		case 5:
-			error = read_file("web/error_pages/405.html");
+			error = read_file("website/error_pages/405.html");
 			response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
 		default:
@@ -132,7 +132,7 @@ int		ws::Server::checkRequest(int i) {
 	}
 	response += "Content-Type: text/html\r\n";
 	if (error.size() == 0) {
-		error = read_file("web/error_pages/default_error.html");
+		error = read_file("website/error_pages/default_error.html");
 	}
 	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
 	response += "\r\n";
