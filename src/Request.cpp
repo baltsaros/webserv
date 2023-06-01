@@ -1,7 +1,8 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_errorCode = -1;}
-ws::Request::Request(std::string buffer) : _buffer(buffer) {
+ws::Request::Request(std::string buffer, Configuration config)
+		: _buffer(buffer), _config(config) {
 	_errorCode = -1;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
@@ -23,6 +24,7 @@ ws::Request::~Request() {}
 
 ws::Request&	ws::Request::operator=(Request const &rhs) {
 	if (this != &rhs) {
+		_config = rhs._config;
 		_buffer = rhs._buffer;
 		_header = rhs._header;
 		_body = rhs._body;

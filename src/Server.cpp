@@ -27,6 +27,7 @@ ws::Server::~Server() {
 
 ws::Server&	ws::Server::operator=(Server const &rhs) {
 	if (this != &rhs) {
+		_config = rhs._config;
 		_timeout = rhs._timeout;
 		_socket = rhs._socket;
 		_req = rhs._req;
@@ -74,7 +75,7 @@ int		ws::Server::handler(int i) {
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
 		// std::cout << _buf << std::endl;
-		Request req(_buf);
+		Request req(_buf, _config);
 		_req = req;
 	}
 	return 1;
@@ -88,7 +89,8 @@ int		ws::Server::responder(int i) {
 		ret = checkRequest(i);
 	else {
 		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ";
-		std::string	msg = "Testing\n";
+		// std::string	msg = "Testing\n";
+		std::string	msg = read_file("website/html/index.html");
 		std::string	response;
 
 		response = header + std::to_string(msg.size());
