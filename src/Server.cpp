@@ -130,6 +130,9 @@ int		ws::Server::checkRequest(int i) {
 			break;
 	}
 	response += "Content-Type: text/html\r\n";
+	if (error.size() == 0) {
+		error = read_file("web/error_pages/default_error.html");
+	}
 	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
 	response += "\r\n";
 	response += error;
