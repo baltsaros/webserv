@@ -34,6 +34,8 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_host = rhs._host;
 		_uAgent = rhs._uAgent;
 		_accept = rhs._accept;
+		_path = rhs._path;
+		_response = rhs._response;
 		_errorCode = rhs._errorCode;
 	}
 	return (*this);
@@ -100,9 +102,11 @@ void	ws::Request::readBuffer() {
 
 // need to check for errors
 void	ws::Request::_parseStartingLine() {
-	size_t	pos;
-	size_t	start;
-
+	size_t		pos;
+	size_t		start;
+	std::string file;
+	bool		cssFlag = false;
+	
 	pos = _header.find(" ");
 	_method = _header.substr(0, pos);
 	if ((_method.compare("GET") && _method.compare("POST")
@@ -114,7 +118,14 @@ void	ws::Request::_parseStartingLine() {
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
 	// need to check every location for the config here
-	if (_target.compare("/")) {
+	// std::cout << "target: " << _target << std::endl;
+	cssFlag = checkCssExtension(_target);
+	if (cssFlag)
+		_path = "website" + _target;
+	else
+		_path = "website/html/index.html";
+	// std::cout << "path: " << _path << std::endl;
+	if (_target.compare("/") && !cssFlag) {
 		_errorCode = 4;
 		return ;
 	}
@@ -124,10 +135,12 @@ void	ws::Request::_parseStartingLine() {
 }
 
 // Getters
-std::string	ws::Request::getMethod() const		{return _method;}
-std::string	ws::Request::getTarget() const		{return _target;}
-std::string	ws::Request::getProtocol() const	{return _protocolVersion;}
-std::string	ws::Request::getHost() const		{return _host;}
-std::string	ws::Request::getUAgent() const		{return _uAgent;}
-std::string	ws::Request::getAccept() const		{return _accept;}
-int			ws::Request::getErrorCode() const	{return _errorCode;}
+std::string	ws::Request::getMethod() const			{return _method;}
+std::string	ws::Request::getTarget() const			{return _target;}
+std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
+std::string	ws::Request::getHost() const			{return _host;}
+std::string	ws::Request::getUAgent() const			{return _uAgent;}
+std::string	ws::Request::getAccept() const			{return _accept;}
+std::string	ws::Request::getPath() const			{return _path;}
+std::string	ws::Request::getResponse() const		{return _response;}
+int			ws::Request::getErrorCode() const		{return _errorCode;}

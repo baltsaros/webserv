@@ -88,9 +88,8 @@ int		ws::Server::responder(int i) {
 	if (_req.getErrorCode() >= 0)
 		ret = checkRequest(i);
 	else {
-		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ";
-		// std::string	msg = "Testing\n";
-		std::string	msg = read_file("website/html/index.html");
+		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
+		std::string	msg = read_file(_req.getPath());
 		std::string	response;
 
 		response = header + std::to_string(msg.size());
@@ -114,19 +113,19 @@ int		ws::Server::checkRequest(int i) {
 	std::string response;
 	switch (errorCode) {
 		case 0:
-			error = read_file("website/error_pages/400.html");
+			error = read_file("website/html/error_pages/400.html");
 			response = "HTTP/1.1 400 Bad Request\r\n";
 			break;
 		case 3:
-			error = read_file("website/error_pages/403.html");
+			error = read_file("website/html/error_pages/403.html");
 			response = "HTTP/1.1 403 Forbidden\r\n";
 			break;
 		case 4:
-			error = read_file("website/error_pages/404.html");
+			error = read_file("website/html/error_pages/404.html");
 			response = "HTTP/1.1 404 Not Found\r\n";
 			break;
 		case 5:
-			error = read_file("website/error_pages/405.html");
+			error = read_file("website/html/error_pages/405.html");
 			response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
 		default:
@@ -134,7 +133,7 @@ int		ws::Server::checkRequest(int i) {
 	}
 	response += "Content-Type: text/html\r\n";
 	if (error.size() == 0) {
-		error = read_file("website/error_pages/default_error.html");
+		error = read_file("website/html/error_pages/default_error.html");
 	}
 	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
 	response += "\r\n";
@@ -242,13 +241,6 @@ void	ws::Server::test_connection(int to_test) {
 		// std::cout << "Webserver error: " << strerror(to_test) << std::endl;
 		// exit(EXIT_FAILURE);
 	// }
-}
-
-std::string	ws::Server::read_file(const std::string& filename) {
-	std::ifstream	input_file(filename);
-	std::stringstream	buffer;
-	buffer << input_file.rdbuf();
-	return buffer.str();
 }
 
 // Getters

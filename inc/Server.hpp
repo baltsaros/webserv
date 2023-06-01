@@ -8,6 +8,7 @@
 # include "Socket.hpp"
 # include "Request.hpp"
 # include "Configuration.hpp"
+# include "ServerUtils.hpp"
 
 # define BUFFER_SIZE 4096 // should be more than 4
 
@@ -24,7 +25,6 @@ class Server {
 		int				accepter();
 		int				handler(int i);
 		int				responder(int i);
-		std::string		read_file(const std::string& filename);
 		int				checkRequest(int i);
 
 	public:
