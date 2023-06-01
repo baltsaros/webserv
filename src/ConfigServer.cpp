@@ -4,13 +4,13 @@ ConfigServer::ConfigServer(std::string & content) {
 
 	createServerBlocks(content);
 	parseServer();
-	// std::cout << "=============START SERVER===============\n";
-	// printVector(this->_ports);
-	// std::cout << this->_host << "\n";
-	// printVector(this->_serverNames);
-	// std::cout << this->_clientMaxBodySize << "\n";
-	// printMap(this->_errorPages);
-	// std::cout << "==============END SERVER================\n";
+	std::cout << "=============START SERVER===============\n";
+	printVector(this->_ports);
+	std::cout << this->_host << "\n";
+	printVector(this->_serverNames);
+	std::cout << this->_clientMaxBodySize << "\n";
+	printMap(this->_errorPages);
+	std::cout << "==============END SERVER================\n";
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {
@@ -274,6 +274,16 @@ void	ConfigServer::setIndex(std::string &index) {
 std::vector<std::string>	ConfigServer::getServerBlocks(void) const {
 
 	return (this->_serverBlocks);
+}
+
+std::vector<ConfigLocation>	ConfigServer::getLocation(void) const {
+
+	return (this->_vectLocations);
+}
+
+ConfigLocation	ConfigServer::getOneLocation(int i) const {
+
+	return (this->_vectLocations[i]);
 }
 
 std::vector<int>	ConfigServer::getPorts(void) const {
