@@ -93,6 +93,14 @@
 				background-color: #404040;
 				color: #99FFCC;
 			}
+
+			#fileToUpload
+			{
+				width: 100%;
+				padding: 12px 20px;
+				margin: 8px 0;
+				box-sizing: border-box;
+			}
 		</style>
 	</head>
 
@@ -105,13 +113,19 @@
 				<li><a href="index.html">Home</a></li>
 				<li><a href="cgi-tester.html">CGI Tester</a></li>
 				<li><a href="upload-file.html">Upload File</a></li>
+				<li><a href="delete-file.html">Delete File</a></li>
 				<li class="right-align"><a href="about.html">About</a></li>
 			</ul>
 		</div>
 	</header>
 
 	<body class="body-style">
-
+		<br><br><br><br><br><br>
+		<form>
+			Choose a file to upload:
+			<input type="file" id="fileToUpload" name="filename">
+			<input type="submit" value="Submit">
+		</form>
 	</body>
 	
 	<footer>
