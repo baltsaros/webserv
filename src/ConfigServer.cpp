@@ -11,6 +11,7 @@ ConfigServer::ConfigServer(std::string & content) {
 	std::cout << this->_clientMaxBodySize << "\n";
 	printMap(this->_errorPages);
 	std::cout << "==============END SERVER================\n";
+	std::cout << "location vector size: " << this->_vectLocations.size() << std::endl;
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {

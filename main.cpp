@@ -12,6 +12,9 @@ int	main(int argc, char **argv) {
 	std::cout << "argv: " << argv[1] << std::endl;
 	Configuration	config(argv[1]);
 
+	std::vector<ConfigLocation>	locations = config.getConfigServer(0).getLocation();
+	std::cout << "location vector size: " << locations.size() << std::endl;
+
 	// int	port = config.getConfigServer(0).getPorts()[0];
 	// ws::Server  s1(AF_INET, SOCK_STREAM, 0, port, INADDR_ANY, 32, config);
 	// s1.launcher();
