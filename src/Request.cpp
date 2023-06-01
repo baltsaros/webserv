@@ -66,14 +66,14 @@ void	ws::Request::readBuffer() {
 	crlf = _buffer.find("\r\n\r\n");
 	if (crlf == std::string::npos || !_buffer.size()) {
 		std::cerr << "Nothing was found" << std::endl;
-		_errorCode = 0;
+		_errorCode = 400;
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
-		_errorCode = 5;
+		_errorCode = 405;
 		return ;
 	}
 	_body = _buffer.substr(crlf + 2);
@@ -111,7 +111,7 @@ void	ws::Request::_parseStartingLine() {
 	_method = _header.substr(0, pos);
 	if ((_method.compare("GET") && _method.compare("POST")
 		&& _method.compare("DELETE")) || !_method.size()) {
-		_errorCode = 5;
+		_errorCode = 405;
 		return ;
 	}
 	start = pos + 1;
@@ -124,9 +124,8 @@ void	ws::Request::_parseStartingLine() {
 		_path = "website" + _target;
 	else
 		_path = "website/html/index.html";
-	// std::cout << "path: " << _path << std::endl;
-	if (_target.compare("/") && !cssFlag) {
-		_errorCode = 4;
+	if (_target.compare("/") && _target.compare("/index.html") && !cssFlag) {
+		_errorCode = 404;
 		return ;
 	}
 	start = pos + 1;

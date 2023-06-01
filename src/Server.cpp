@@ -108,32 +108,30 @@ int		ws::Server::responder(int i) {
 // check for an error code and create an according response
 int		ws::Server::checkRequest(int i) {
 	int	errorCode = _req.getErrorCode();
+	std::map<int, std::string>	errorPath = _config.getConfigServer()[0]->getErrorPages();
 	int	ret = 0;
-	std::string error;
+	std::string error = read_file(errorPath[errorCode]);
 	std::string response;
 	switch (errorCode) {
-		case 0:
-			error = read_file("website/html/error_pages/400.html");
+		case 400:
 			response = "HTTP/1.1 400 Bad Request\r\n";
 			break;
-		case 3:
-			error = read_file("website/html/error_pages/403.html");
+		case 403:
 			response = "HTTP/1.1 403 Forbidden\r\n";
 			break;
-		case 4:
-			error = read_file("website/html/error_pages/404.html");
+		case 404:
 			response = "HTTP/1.1 404 Not Found\r\n";
 			break;
-		case 5:
-			error = read_file("website/html/error_pages/405.html");
+		case 405:
 			response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
 		default:
 			break;
 	}
 	response += "Content-Type: text/html\r\n";
-	if (error.size() == 0) {
+	if (errorPath[errorCode].size() == 0) {
 		error = read_file("website/html/error_pages/default_error.html");
+		response = "HTTP/1.1 400 Bad Request\r\n";
 	}
 	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
 	response += "\r\n";
