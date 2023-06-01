@@ -12,7 +12,10 @@ int	main(int argc, char **argv) {
 	std::cout << "argv: " << argv[1] << std::endl;
 	Configuration	config(argv[1]);
 
-	int	port = config.getConfigServer(0).getPorts()[0];
+	// std::map<int, std::string>	errors = config.getConfigServer()[0]->getErrorPages();
+	// printMap(errors);
+
+	int	port = config.getConfigServer()[0]->getPorts()[0];
 	ws::Server  s1(AF_INET, SOCK_STREAM, 0, port, INADDR_ANY, 32, config);
 	s1.launcher();
 

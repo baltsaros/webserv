@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abuzdin <abuzdin@student.s19.be>           +#+  +:+       +#+        */
+/*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 11:58:45 by abuzdin          ###   ########.fr       */
+/*   Updated: 2023/06/01 15:24:11 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,9 @@ Configuration::Configuration(Configuration const & src) {
 	
 	*this = src;
 }
-Configuration::~Configuration()
-{
+Configuration::~Configuration() {
+	
+	this->_vectServers.clear();
 }
 
 Configuration	& Configuration::operator=(Configuration const & rhs) {
@@ -82,11 +83,11 @@ then pushes back the constructed Servers into _vectServers.
 void	Configuration::parseConfig() {
 
 	for (int i = 0; i < this->_configBlocks.size(); i++) {
-		this->_vectServers.push_back(ConfigServer(this->_configBlocks[i]));
+		this->_vectServers.push_back(new ConfigServer(this->_configBlocks[i]));
 	}
 }
 
-ConfigServer	Configuration::getConfigServer(int i) const {
+std::vector<ConfigServer *>	Configuration::getConfigServer(void) const {
 	
-	return (this->_vectServers[i]);
+	return (this->_vectServers);
 }
