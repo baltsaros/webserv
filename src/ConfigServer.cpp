@@ -4,14 +4,14 @@ ConfigServer::ConfigServer(std::string & content) {
 
 	createServerBlocks(content);
 	parseServer();
-	std::cout << "=============START SERVER===============\n";
-	printVector(this->_ports);
-	std::cout << this->_host << "\n";
-	printVector(this->_serverNames);
-	std::cout << this->_clientMaxBodySize << "\n";
-	printMap(this->_errorPages);
-	std::cout << "==============END SERVER================\n";
-	std::cout << "location vector size: " << this->_vectLocations.size() << std::endl;
+	// std::cout << "=============START SERVER===============\n";
+	// printVector(this->_ports);
+	// std::cout << this->_host << "\n";
+	// printVector(this->_serverNames);
+	// std::cout << this->_clientMaxBodySize << "\n";
+	// printMap(this->_errorPages);
+	// std::cout << "==============END SERVER================\n";
+	// std::cout << "location vector size: " << this->_vectLocations.size() << std::endl;
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {
@@ -19,8 +19,10 @@ ConfigServer::ConfigServer(ConfigServer const & src) {
 	*this = src;
 }
 
-ConfigServer::~ConfigServer()
-{}
+ConfigServer::~ConfigServer() {
+	
+	this->_vectLocations.clear();
+}
 
 /*
 Cuts the server block into one first block containing the general block containing
@@ -233,7 +235,7 @@ void	ConfigServer::parseServer() {
 		dispatch(*it);
 	}
 	for (int i = 1; i < this->_serverBlocks.size(); i++) {
-		this->_vectLocations.push_back(ConfigLocation(this->_serverBlocks[i]));
+		this->_vectLocations.push_back(new ConfigLocation(this->_serverBlocks[i]));
 	}
 }
 
@@ -277,14 +279,9 @@ std::vector<std::string>	ConfigServer::getServerBlocks(void) const {
 	return (this->_serverBlocks);
 }
 
-std::vector<ConfigLocation>	ConfigServer::getLocation(void) const {
+std::vector<ConfigLocation *>	ConfigServer::getLocation(void) const {
 
 	return (this->_vectLocations);
-}
-
-ConfigLocation	ConfigServer::getOneLocation(int i) const {
-
-	return (this->_vectLocations[i]);
 }
 
 std::vector<int>	ConfigServer::getPorts(void) const {

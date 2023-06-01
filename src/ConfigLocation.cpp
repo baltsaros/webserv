@@ -5,13 +5,13 @@ ConfigLocation::ConfigLocation(std::string & content) {
 
 	parseLocation(content);
 	printMap(this->_errorPages);
-	std::cout << "=============START LOCATION===============\n";
-	std::cout << "root: " << this->_root << std::endl;
-	std::cout << "index: " << this->_index << std::endl;
-	std::cout << "autoindex: " << this->_autoindex << std::endl;
-	printVector(this->_methods);
-	printMap(this->_return);
-	std::cout << "==============END LOCATION================\n";
+	// std::cout << "=============START LOCATION===============\n";
+	// std::cout << "root: " << this->_root << std::endl;
+	// std::cout << "index: " << this->_index << std::endl;
+	// std::cout << "autoindex: " << this->_autoindex << std::endl;
+	// printVector(this->_methods);
+	// printMap(this->_return);
+	// std::cout << "==============END LOCATION================\n";
 }
 
 ConfigLocation::ConfigLocation(ConfigLocation const & src) {

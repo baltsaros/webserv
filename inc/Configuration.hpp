@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abuzdin <abuzdin@student.s19.be>           +#+  +:+       +#+        */
+/*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:14:14 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 11:55:57 by abuzdin          ###   ########.fr       */
+/*   Updated: 2023/06/01 15:22:09 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class ConfigServer;
 class Configuration {
 	
 	private:
-		std::vector<ConfigServer>	_vectServers;
+		std::vector<ConfigServer *>	_vectServers;
 		std::vector<std::string>	_configBlocks;
 
 
@@ -43,7 +43,7 @@ class Configuration {
 
 		Configuration	& operator=(Configuration const & rhs);
 		
-		ConfigServer	getConfigServer(int i) const;
+		std::vector<ConfigServer *>	getConfigServer(void) const;
 };
 
 #endif

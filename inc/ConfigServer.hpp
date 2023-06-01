@@ -32,7 +32,7 @@ class ConfigServer {
 
 	private:
 		std::vector<std::string>	_serverBlocks;
-		std::vector<ConfigLocation>	_vectLocations;
+		std::vector<ConfigLocation *>	_vectLocations;
 		std::vector<int>			_ports;
 		std::string					_host;
 		std::vector<std::string>	_serverNames;
@@ -69,8 +69,7 @@ class ConfigServer {
 		void	setIndex(std::string &index);
 
 		std::vector<std::string>	getServerBlocks(void) const;
-		std::vector<ConfigLocation>	getLocation(void) const;
-		ConfigLocation				getOneLocation(int i) const;
+		std::vector<ConfigLocation *>	getLocation(void) const;
 		std::vector<int>			getPorts(void) const;
 		std::string					getHost(void) const;
 		std::vector<std::string>	getServerNames(void) const;
