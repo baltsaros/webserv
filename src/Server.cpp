@@ -4,7 +4,8 @@
 ws::Server::Server() {}
 
 ws::Server::Server(int domain, int service, int protocol,
-					int port, u_long interface, int backlog) {
+					int port, u_long interface, int backlog,
+					Configuration config) : _config(config) {
 	_socket = new Socket(domain, service, protocol, port, interface, backlog);
 	_max_sd = _socket->get_maxsd();
 	// Initialize set

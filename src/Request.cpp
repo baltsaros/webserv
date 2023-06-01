@@ -111,6 +111,7 @@ void	ws::Request::_parseStartingLine() {
 	start = pos + 1;
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
+	// need to check every location for the config here
 	if (_target.compare("/")) {
 		_errorCode = 4;
 		return ;
