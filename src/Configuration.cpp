@@ -6,7 +6,7 @@
 /*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/05/31 10:24:44 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/06/01 11:51:36 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,21 @@ Configuration::Configuration(std::string const & path) {
 	parseConfig();
 }
 
+Configuration::Configuration(Configuration const & src) {
+	
+	*this = src;
+}
 Configuration::~Configuration()
 {
+}
+
+Configuration	& Configuration::operator=(Configuration const & rhs) {
+
+	if (this != &rhs) {
+		this->_vectServers = rhs._vectServers;
+		this->_configBlocks = rhs._configBlocks;
+	}
+	return (*this);
 }
 /*
 Turns the content of the config file into a string (content) and separates it into blocks.
