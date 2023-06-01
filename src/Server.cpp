@@ -7,7 +7,6 @@ ws::Server::Server(int domain, int service, int protocol,
 					int port, u_long interface, int backlog) {
 	_socket = new Socket(domain, service, protocol, port, interface, backlog);
 	_max_sd = _socket->get_maxsd();
-	memset(_buf, '\0', sizeof(_buf));
 	// Initialize set
 	FD_ZERO(&_master_set);
 	// Add a new socket to the set
@@ -53,23 +52,26 @@ int		ws::Server::accepter() {
 // Print the received message
 int		ws::Server::handler(int i) {
 	std::cout << "Reading" << std::endl;
-	memset(_buf, '\0', sizeof(_buf));
-	// With MSG_DONTWAIT recv won't block socket if there is nothing to read
-	ssize_t	valread = recv(i, _buf, sizeof(_buf), MSG_DONTWAIT);
-	// if (valread == -1 && errno != EWOULDBLOCK) {
-	// 	std::cerr << "Recv() error" << std::endl;
-	// 	return 0;
-	// }
-	// -1 means error; 0 - connection was closed by the client
-	if (valread == -1) {
-		// test_connection(valread);
-		return -1;
-	}
-	else if (valread == 0) {
-		std::cout << "Connection was closed" << std::endl;
-		return 0;
-	}
-	if (_buf) {
+	_buf.clear();
+	char	cbuf[BUFFER_SIZE];
+	ssize_t	bytesRead;
+	// keep reading incoming data until there is nothing left to read
+	do {
+		// With MSG_DONTWAIT recv won't block socket if there is nothing to read
+		bytesRead = recv(i, cbuf, BUFFER_SIZE - 1, MSG_DONTWAIT);
+		if (bytesRead > 0) {
+			cbuf[bytesRead] = '\0';
+			_buf += cbuf;
+		}
+		// -1 means error; 0 - connection was closed by the client
+		else if (bytesRead == 0) {
+			std::cout << "Connection was closed" << std::endl;
+			return 0;
+		}
+		else
+			return -1;
+	} while (bytesRead == BUFFER_SIZE - 1);
+	if (_buf.size() > 0) {
 		// std::cout << _buf << std::endl;
 		Request req(_buf);
 		_req = req;
@@ -164,7 +166,6 @@ void	ws::Server::launcher() {
 					// if so, we need to accept all incoming connections
 					while (19) {
 						new_sd = accepter();
-						std::cout << "new_sd: " << new_sd << std::endl;
 						if (new_sd < 0) {
 							// EWOULDBLOCK in this case means that there are no more
 							// pending connections on the queue
@@ -184,7 +185,7 @@ void	ws::Server::launcher() {
 							break ;
 					}
 				}
-				else { 
+				else {
 					// if it is not a listnening socket, we don't need to accept
 					// an incoming connection. The existing connections is readable
 					close_conn = false;
@@ -216,11 +217,11 @@ void	ws::Server::launcher() {
 								_max_sd -= 1;
 						}
 					}
-				}
-			}
-		}
+				} // else
+			} // FD_ISSET
+		} // for loop to check every descriptor
 		std::cout << "==== DONE ====" << std::endl;
-	}
+	} // main loop begins
 	std::cout << "Closing fds" << std::endl;
 	for (int i = 0; i <= _max_sd; ++i) {
 		if (FD_ISSET(i, &_master_set))

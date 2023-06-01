@@ -8,6 +8,8 @@
 # include "Socket.hpp"
 # include "Request.hpp"
 
+# define BUFFER_SIZE 4096 // should be more than 4
+
 namespace	ws {
 class Server {
 	private:
@@ -15,7 +17,7 @@ class Server {
 		Socket		*_socket;
 		Request		_req;
 		int			_sockfd, _max_sd;
-		char		_buf[30000];
+		std::string	_buf;
 		fd_set		_working_set, _master_set;
 		int			accepter();
 		int			handler(int i);
