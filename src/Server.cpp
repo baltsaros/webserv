@@ -96,7 +96,7 @@ int		ws::Server::responder(int i) {
 		response = header + std::to_string(msg.size());
 		response += "\r\n\r\n";
 		response += msg;
-		ret = send(i, response.c_str(), response.size(), 0);
+		ret = write(i, response.c_str(), response.size());
 	}
 	// std::cout << to_send << std::endl;
 	if (ret == -1) {
