@@ -11,6 +11,7 @@
 			{
 				display: block;
 				font-size: 200px;
+				text-align: center;
 			}
 
 			.navbar
@@ -116,11 +117,11 @@
 		<div>
 			<form action="../../src/cgi-bin/calculator.py" method="post">
 				<label for="number1">Number one:</label><br>
-				<input type="number" id="num1" name="num1"><br>
+				<input type="number" id="num1" name="num1" required><br>
 				<label for="number2">Number two:</label><br>
-				<input type="number" id="num2" name="num2"><br>
+				<input type="number" id="num2" name="num2" required><br>
 				<label for="operator">Operator:</label><br>
-				<select id="operator" name="operator">
+				<select id="operator" name="operator" required>
 					<option value="plus">+</option>
 					<option value="minus">-</option>
 					<option value="multiply">*</option>
