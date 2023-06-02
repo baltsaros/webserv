@@ -1,7 +1,7 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_errorCode = -1;}
-ws::Request::Request(std::string buffer, Configuration config)
+ws::Request::Request(const std::string &buffer, const Configuration &config)
 		: _buffer(buffer), _config(config) {
 	_errorCode = -1;
 	readBuffer();

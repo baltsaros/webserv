@@ -84,60 +84,16 @@ int		ws::Server::handler(int i) {
 // Send a response back
 int		ws::Server::responder(int i) {
 	int			ret;
-	// std::cout << "code: " << _req.getErrorCode() << std::endl;
-	if (_req.getErrorCode() >= 0)
-		ret = checkRequest(i);
-	else {
-		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
-		std::string	msg = read_file(_req.getPath());
-		std::string	response;
+	Response	response(_req, _config);
+	std::string	toSend;
 
-		response = header + std::to_string(msg.size());
-		response += "\r\n\r\n";
-		response += msg;
-		ret = write(i, response.c_str(), response.size());
-	}
-	// std::cout << to_send << std::endl;
+	toSend = response.getResponse();
+	ret = send(i, toSend.c_str(), toSend.size(), 0);
 	if (ret == -1) {
 		std::cerr << "Send() error" << std::endl;
 		return -1;
 	}
 	return ret;
-}
-
-// check for an error code and create an according response
-int		ws::Server::checkRequest(int i) {
-	int	errorCode = _req.getErrorCode();
-	std::map<int, std::string>	errorPath = _config.getConfigServer()[0]->getErrorPages();
-	int	ret = 0;
-	std::string error = read_file(errorPath[errorCode]);
-	std::string response;
-	switch (errorCode) {
-		case 400:
-			response = "HTTP/1.1 400 Bad Request\r\n";
-			break;
-		case 403:
-			response = "HTTP/1.1 403 Forbidden\r\n";
-			break;
-		case 404:
-			response = "HTTP/1.1 404 Not Found\r\n";
-			break;
-		case 405:
-			response = "HTTP/1.1 405 Method Not Allowed\r\n";
-			break;
-		default:
-			break;
-	}
-	response += "Content-Type: text/html\r\n";
-	if (errorPath[errorCode].size() == 0) {
-		error = read_file("website/html/error_pages/default_error.html");
-		response = "HTTP/1.1 400 Bad Request\r\n";
-	}
-	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
-	response += "\r\n";
-	response += error;
-	ret = send(i, response.c_str(), response.size(), 0);
-	return (ret);
 }
 
 void	ws::Server::launcher() {
