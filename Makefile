@@ -19,8 +19,12 @@ INCS		= -I $(INC_DIR)
 SRC_DIR		= src/
 SRCS		= main.cpp \
 				$(SRC_DIR)/Configuration.cpp \
+				$(SRC_DIR)/ConfigServer.cpp \
+				$(SRC_DIR)/ConfigLocation.cpp \
+				$(SRC_DIR)/ConfigUtils.cpp \
 				$(SRC_DIR)/Request.cpp \
 				$(SRC_DIR)/Server.cpp \
+				$(SRC_DIR)/ServerUtils.cpp \
 				$(SRC_DIR)/Socket.cpp
 
 OBJ_DIR		= objs

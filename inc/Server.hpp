@@ -7,26 +7,31 @@
 # include <sstream>
 # include "Socket.hpp"
 # include "Request.hpp"
+# include "Configuration.hpp"
+# include "ServerUtils.hpp"
+
+# define BUFFER_SIZE 4096 // should be more than 4
 
 namespace	ws {
 class Server {
 	private:
 		struct timeval	_timeout;
-		Socket		*_socket;
-		Request		_req;
-		int			_sockfd, _max_sd;
-		char		_buf[30000];
-		fd_set		_working_set, _master_set;
-		void		accepter();
-		void		handler();
-		void		responder();
-		std::string	read_file(const std::string& filename);
-		int			checkRequest();
+		Socket			*_socket;
+		Request			_req;
+		Configuration	_config;
+		int				_sockfd, _max_sd;
+		std::string		_buf;
+		fd_set			_working_set, _master_set;
+		int				accepter();
+		int				handler(int i);
+		int				responder(int i);
+		int				checkRequest(int i);
 
 	public:
 		Server();
 		Server(int domain, int service, int protocol,
-				int port, u_long interface, int backlog);
+				int port, u_long interface, int backlog,
+				Configuration config);
 		Server(Server const &src);
 		~Server();
 
