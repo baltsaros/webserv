@@ -14,6 +14,10 @@ int	main(int argc, char **argv) {
 
 	// std::map<int, std::string>	errors = config.getConfigServer()[0]->getErrorPages();
 	// printMap(errors);
+	std::vector<ConfigLocation*>	locs = config.getConfigServer()[0]->getLocation();
+	std::cout << "root1: " << config.getConfigServer()[0]->getRoot() << std::endl;
+	std::cout << "root2: " << locs[0]->getRoot() << std::endl;
+	
 
 	int	port = config.getConfigServer()[0]->getPorts()[0];
 	ws::Server  s1(AF_INET, SOCK_STREAM, 0, port, INADDR_ANY, 32, config);

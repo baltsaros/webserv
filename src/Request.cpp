@@ -124,6 +124,7 @@ void	ws::Request::_parseStartingLine() {
 		_path = "website" + _target;
 	else
 		_path = "website/html/index.html";
+	// std::cout << "path: " << _path << std::endl;
 	if (_target.compare("/") && _target.compare("/index.html") && !cssFlag) {
 		_errorCode = 404;
 		return ;
