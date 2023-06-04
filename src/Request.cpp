@@ -1,7 +1,7 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_errorCode = -1;}
-ws::Request::Request(std::string buffer, Configuration config)
+ws::Request::Request(const std::string &buffer, const Configuration &config)
 		: _buffer(buffer), _config(config) {
 	_errorCode = -1;
 	readBuffer();
@@ -124,6 +124,7 @@ void	ws::Request::_parseStartingLine() {
 		_path = "website" + _target;
 	else
 		_path = "website/html/index.html";
+	// std::cout << "path: " << _path << std::endl;
 	if (_target.compare("/") && _target.compare("/index.html") && !cssFlag) {
 		_errorCode = 404;
 		return ;

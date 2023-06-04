@@ -7,6 +7,7 @@
 # include <sstream>
 # include "Socket.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 # include "Configuration.hpp"
 # include "ServerUtils.hpp"
 
@@ -25,17 +26,16 @@ class Server {
 		int				accepter();
 		int				handler(int i);
 		int				responder(int i);
-		int				checkRequest(int i);
 
 	public:
 		Server();
 		Server(int domain, int service, int protocol,
 				int port, u_long interface, int backlog,
 				Configuration config);
-		Server(Server const &src);
+		Server(const Server &src);
 		~Server();
 
-		Server&	operator=(Server const &rhs);
+		Server&	operator=(const Server &rhs);
 		void	launcher();
 		void	test_connection(int to_test);
 		Socket*	get_server_sd();

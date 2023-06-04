@@ -27,11 +27,11 @@ class Request {
 
 	public:
 		Request();
-		Request(std::string buffer, Configuration config);
-		Request(Request const &src);
+		Request(const std::string &buffer, const Configuration &config);
+		Request(const Request &src);
 		~Request();
 
-		Request&	operator=(Request const &rhs);
+		Request&	operator=(const Request &rhs);
 		void	readBuffer();
 
 		// getters

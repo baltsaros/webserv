@@ -20,10 +20,10 @@ class Socket {
 		Socket();
 		Socket(int domain, int service, int protocol, int port,
 				u_long interface, int backlog);
-		Socket(Socket const &src);
+		Socket(const Socket &src);
 		~Socket();
 
-		Socket&				operator=(Socket const &rhs);
+		Socket&				operator=(const Socket &rhs);
 		void				connect_to_network();
 		void				test_connection(int to_test);
 		struct sockaddr_in	get_address() const;
