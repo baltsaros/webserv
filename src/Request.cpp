@@ -106,6 +106,7 @@ void	ws::Request::_parseStartingLine() {
 	size_t		start;
 	std::string file;
 	bool		cssFlag = false;
+	std::map<std::string, ConfigLocation *>	locations;
 	
 	pos = _header.find(" ");
 	_method = _header.substr(0, pos);
@@ -117,15 +118,32 @@ void	ws::Request::_parseStartingLine() {
 	start = pos + 1;
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
-	// need to check every location for the config here
-	// std::cout << "target: " << _target << std::endl;
-	cssFlag = checkCssExtension(_target);
+	locations = _config.getConfigServer()[0]->getLocation();
+
+	// check what root we use; for now i dont understand how to tackle this 
+	// std::string	root;
+	// root = _config.getConfigServer()[0]->getRoot();
+	// if (root.size() == 0)
+	// 	root = locations["/"]->getRoot();
+
+	cssFlag = checkExtension(_target, ".css");
+	// creating a filepath for recv(); if _target has .css extension
+	// it looks for /css location; if target is /, it returns a home page
+	// in all other cases it append _target to the root path
 	if (cssFlag)
-		_path = "website" + _target;
+		_path = locations["/css"]->getRoot();
+	else if (!_target.compare("/"))
+		_path = locations["/"]->getRoot() + "/index.html";
 	else
-		_path = "website/html/index.html";
+		_path = locations["/"]->getRoot() + _target;
+	// simple check of whether we need to append ".html" to the filepath or not
+	if (!cssFlag && !checkExtension(_path, ".html"))
+		_path += ".html";
+	// std::cout << "target: " << _target << std::endl;
 	// std::cout << "path: " << _path << std::endl;
-	if (_target.compare("/") && _target.compare("/index.html") && !cssFlag) {
+	// std::cout << "exist: " << fileExists(_path) << std::endl;
+	// if file at _path does not exist, return error 404
+	if (!fileExists(_path)) {
 		_errorCode = 404;
 		return ;
 	}
