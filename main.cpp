@@ -19,12 +19,9 @@ int	main(int argc, char **argv) {
 	// std::cout << "root css: " << locs["/css"]->getRoot() << std::endl;
 	// std::cout << "root /: " << locs["/"]->getRoot() << std::endl;
 
-	std::vector<int>	ports = config.getConfigServer()[0]->getPorts();
-	// std::vector<int>	ports2 = config.getConfigServer()[1]->getPorts();
-	ws::Server  s1(AF_INET, SOCK_STREAM, 0, ports, INADDR_ANY, 32, config);
-	// ws::Server  s2(AF_INET, SOCK_STREAM, 0, ports2, INADDR_ANY, 32, config);
+	config.getConfigServer()[0];
+	ws::Server  s1(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 32, config);
 	s1.launcher();
-	// s2.launcher();
 
 	return (0);
 }

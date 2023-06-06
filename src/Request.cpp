@@ -1,9 +1,10 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_errorCode = -1;}
-ws::Request::Request(const std::string &buffer, const Configuration &config)
+ws::Request::Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation *> locations)
 		: _buffer(buffer), _config(config) {
 	_errorCode = -1;
+	_locations = locations;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
@@ -103,9 +104,9 @@ void	ws::Request::readBuffer() {
 
 void	ws::Request::_checkPath() {
 	bool		cssFlag = false;
-	std::map<std::string, ConfigLocation *>	locations;
+	// std::map<std::string, ConfigLocation *>	locations;
 
-	locations = _config.getConfigServer()[0]->getLocation();
+	// locations = _config.getConfigServer()[0]->getLocation();
 
 	// check what root we use; for now i dont understand how to tackle this 
 	// std::string	root;
@@ -118,11 +119,11 @@ void	ws::Request::_checkPath() {
 	// it looks for /css location; if target is /, it returns a home page
 	// in all other cases it append _target to the root path
 	if (cssFlag)
-		_path = locations["/css"]->getRoot();
+		_path = _locations["/css"]->getRoot();
 	else if (!_target.compare("/"))
-		_path = locations["/"]->getRoot() + "/" + locations["/"]->getIndex();
+		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
 	else
-		_path = locations["/"]->getRoot() + _target;
+		_path = _locations["/"]->getRoot() + _target;
 	// simple check of whether we need to append ".html" to the filepath or not
 	if (!cssFlag && !checkExtension(_path, ".html"))
 		_path += ".html";
