@@ -130,10 +130,8 @@ void	ws::Request::_checkPath() {
 	// std::cout << "path: " << _path << std::endl;
 	// std::cout << "exist: " << fileExists(_path) << std::endl;
 	// if file at _path does not exist, return error 404
-	if (!fileExists(_path)) {
+	if (!fileExists(_path))
 		_errorCode = 404;
-		return ;
-	}
 }
 
 // need to check for errors
