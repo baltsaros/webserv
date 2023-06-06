@@ -4,14 +4,14 @@ ConfigServer::ConfigServer(std::string & content) {
 
 	createServerBlocks(content);
 	parseServer();
-	std::cout << "=============START SERVER===============\n";
-	printVector(this->_ports);
-	std::cout << this->_host << "\n";
-	printVector(this->_serverNames);
-	std::cout << this->_clientMaxBodySize << "\n";
-	printMap(this->_errorPages);
-	std::cout << "==============END SERVER================\n";
-	std::cout << "location map size: " << this->_mapLocations.size() << std::endl;
+	// std::cout << "=============START SERVER===============\n";
+	// printVector(this->_ports);
+	// std::cout << this->_host << "\n";
+	// printVector(this->_serverNames);
+	// std::cout << this->_clientMaxBodySize << "\n";
+	// printMap(this->_errorPages);
+	// std::cout << "==============END SERVER================\n";
+	// std::cout << "location map size: " << this->_mapLocations.size() << std::endl;
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {

@@ -70,6 +70,7 @@ void	ws::Request::readBuffer() {
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
+	// std::cout << "Header: " << _header << "\n";
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
@@ -119,7 +120,7 @@ void	ws::Request::_checkPath() {
 	if (cssFlag)
 		_path = locations["/css"]->getRoot();
 	else if (!_target.compare("/"))
-		_path = locations["/"]->getRoot() + "/index.html";
+		_path = locations["/"]->getRoot() + "/" + locations["/"]->getIndex();
 	else
 		_path = locations["/"]->getRoot() + _target;
 	// simple check of whether we need to append ".html" to the filepath or not
