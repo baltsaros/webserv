@@ -16,21 +16,23 @@
 namespace	ws {
 class Server {
 	private:
-		struct timeval	_timeout;
-		Socket			*_socket;
-		Request			_req;
-		Configuration	_config;
-		int				_sockfd, _max_sd;
-		std::string		_buf;
-		fd_set			_working_set, _master_set;
-		int				accepter();
-		int				handler(int i);
-		int				responder(int i);
+		struct timeval		_timeout;
+		Socket				*_socket;
+		std::vector<int>	_sockfds;
+		Request				_req;
+		Configuration		_config;
+		int					_max_sd;
+		std::string			_buf;
+		fd_set				_working_set, _master_set;
+		int					accepter(int sockfd);
+		int					handler(int i);
+		int					responder(int i);
+		bool				checkSocket(int i);
 
 	public:
 		Server();
 		Server(int domain, int service, int protocol,
-				int port, u_long interface, int backlog,
+				std::vector<int> ports, u_long interface, int backlog,
 				Configuration config);
 		Server(const Server &src);
 		~Server();

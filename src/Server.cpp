@@ -4,14 +4,16 @@
 ws::Server::Server() {}
 
 ws::Server::Server(int domain, int service, int protocol,
-					int port, u_long interface, int backlog,
+					std::vector<int> ports, u_long interface, int backlog,
 					Configuration config) : _config(config) {
-	_socket = new Socket(domain, service, protocol, port, interface, backlog);
+	_socket = new Socket(domain, service, protocol, ports, interface, backlog);
 	_max_sd = _socket->get_maxsd();
+	_sockfds = _socket->get_sockets();
 	// Initialize set
 	FD_ZERO(&_master_set);
-	// Add a new socket to the set
-	FD_SET(_socket->get_socket(), &_master_set);
+	// Add a new socket/sockets to the set
+	for (std::vector<int>::iterator it = _sockfds.begin(); it != _sockfds.end(); ++it)
+		FD_SET((*it), &_master_set);
 	// Set timeout time for select; 3 mins in out case;
 	_timeout.tv_sec = 3 * 60;
 	_timeout.tv_usec = 0;
@@ -31,7 +33,7 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 		_timeout = rhs._timeout;
 		_socket = rhs._socket;
 		_req = rhs._req;
-		_sockfd = rhs._sockfd;
+		_sockfds = rhs._sockfds;
 		_max_sd = rhs._max_sd;
 		_working_set = rhs._working_set;
 		_master_set = rhs._master_set;
@@ -41,14 +43,15 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 
 // Accept a connection on our socket and creates a new socket ft that is linked to the original one
 // Receive a message from the socket _sockfd
-int		ws::Server::accepter() {
+int		ws::Server::accepter(int sockfd) {
 	std::cout << "Accepting" << std::endl;
 	struct sockaddr_in	address = _socket->get_address();
+	int	new_sd;
 	int	addrlen = sizeof(address);
 
-	_sockfd = accept(_socket->get_socket(), (struct sockaddr *)&address,
+	new_sd = accept(sockfd, (struct sockaddr *)&address,
 			(socklen_t *)&addrlen);
-	return _sockfd;
+	return new_sd;
 }
 
 // Print the received message
@@ -96,6 +99,16 @@ int		ws::Server::responder(int i) {
 	return ret;
 }
 
+bool	ws::Server::checkSocket(int i) {
+	std::vector<int>::iterator	it;
+
+	for (it = _sockfds.begin(); it != _sockfds.end(); ++it) {
+		if (i == *it)
+			return true;
+	}
+	return false;
+}
+
 void	ws::Server::launcher() {
 	int		ret = 0, sds_ready = 0, new_sd = 0;
 	bool	end_server = false, close_conn = false;
@@ -121,10 +134,10 @@ void	ws::Server::launcher() {
 			if (FD_ISSET(i, &_working_set)) {
 				sds_ready -= 1;
 				// check if i is the listening socket
-				if (i == _socket->get_socket()) {
+				if (checkSocket(i)) {
 					// if so, we need to accept all incoming connections
 					while (19) {
-						new_sd = accepter();
+						new_sd = accepter(i);
 						if (new_sd < 0) {
 							// EWOULDBLOCK in this case means that there are no more
 							// pending connections on the queue
