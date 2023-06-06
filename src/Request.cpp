@@ -100,24 +100,10 @@ void	ws::Request::readBuffer() {
 	// std::cout << "accept: " << _accept << std::endl;
 }
 
-// need to check for errors
-void	ws::Request::_parseStartingLine() {
-	size_t		pos;
-	size_t		start;
-	std::string file;
+void	ws::Request::_checkPath() {
 	bool		cssFlag = false;
 	std::map<std::string, ConfigLocation *>	locations;
-	
-	pos = _header.find(" ");
-	_method = _header.substr(0, pos);
-	if ((_method.compare("GET") && _method.compare("POST")
-		&& _method.compare("DELETE")) || !_method.size()) {
-		_errorCode = 405;
-		return ;
-	}
-	start = pos + 1;
-	pos = _header.find(" ", start);
-	_target = _header.substr(start, pos - start);
+
 	locations = _config.getConfigServer()[0]->getLocation();
 
 	// check what root we use; for now i dont understand how to tackle this 
@@ -147,6 +133,26 @@ void	ws::Request::_parseStartingLine() {
 		_errorCode = 404;
 		return ;
 	}
+}
+
+// need to check for errors
+void	ws::Request::_parseStartingLine() {
+	size_t		pos;
+	size_t		start;
+	std::string file;
+	
+	
+	pos = _header.find(" ");
+	_method = _header.substr(0, pos);
+	if ((_method.compare("GET") && _method.compare("POST")
+		&& _method.compare("DELETE")) || !_method.size()) {
+		_errorCode = 405;
+		return ;
+	}
+	start = pos + 1;
+	pos = _header.find(" ", start);
+	_target = _header.substr(start, pos - start);
+	_checkPath();
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
 	_protocolVersion = _header.substr(start, pos - start);

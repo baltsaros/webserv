@@ -23,6 +23,7 @@ class Request {
 		int					_errorCode;
 		void				_checkPos(size_t pos);
 		std::string			_getParam(std::string toGet, size_t offset);
+		void				_checkPath();
 		void				_parseStartingLine();
 
 	public:
