@@ -4,12 +4,13 @@
 ws::Socket::Socket() {}
 
 ws::Socket::Socket(int domain, int service, int protocol, std::vector<int> ports,
-					u_long interface, int backlog) {
+					u_long interface, int backlog, int generation) {
 	int	ret;
 	int	on = 1;
 	int	sockfd;
 	std::vector<int>::iterator	it;
 
+	_generation = generation;
 	for (it = ports.begin(); it != ports.end(); ++it) {
 		// Setting server parameters
 		_address.sin_family = domain;
@@ -45,6 +46,7 @@ ws::Socket&	ws::Socket::operator=(Socket const &rhs) {
 		_max_sd = rhs._max_sd;
 		_backlog = rhs._backlog;
 		_address = rhs._address;
+		_generation = rhs._generation;
 	}
 	return (*this);
 }
@@ -66,6 +68,8 @@ void	ws::Socket::connect_to_network(int sockfd) {
 	// FD_SET(_sockfd, &_master_set);
 }
 
+void	ws::Socket::setGeneration(int generation) {_generation = generation;}
+
 // Check for errors; socket, bind and listen return -1 on error and set errno to the appropriate value
 void	ws::Socket::test_connection(int to_test) {
 	if (to_test < 0) {
@@ -75,17 +79,13 @@ void	ws::Socket::test_connection(int to_test) {
 }
 
 // Getters
-struct sockaddr_in	ws::Socket::get_address() const {
-	return (_address);
-}
+struct sockaddr_in	ws::Socket::getAddress() const {return _address;}
 
-std::vector<int>	ws::Socket::get_sockets() const {
-	return (_sockfds);
-}
+std::vector<int>	ws::Socket::getSockets() const {return _sockfds;}
 
-int	ws::Socket::get_maxsd() const {
-	return (_max_sd);
-}
+int	ws::Socket::getMaxsd() const {return _max_sd;}
+
+int	ws::Socket::getGeneration() const {return _generation;}
 
 // fd_set	ws::Socket::get_masterset() const {
 // 	return (_master_set);

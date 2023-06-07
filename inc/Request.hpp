@@ -37,6 +37,9 @@ class Request {
 		void	readBuffer();
 
 		// getters
+		std::string	getBuffer() const;
+		std::string	getHeader() const;
+		std::string	getBody() const;
 		std::string	getMethod() const;
 		std::string	getTarget() const;
 		std::string	getProtocol() const;

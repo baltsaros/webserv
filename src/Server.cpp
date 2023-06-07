@@ -7,14 +7,15 @@ ws::Server::Server(int domain, int service, int protocol,
 					u_long interface, int backlog,
 					Configuration config) : _config(config) {
 	// get all servers from the confing
+	int	generation = 1;
 	_servers = _config.getConfigServer();
 	_max_sd = 0;
 	// iterate every server block; create a socket for every port and then add the socket
 	// to the vector of sockets; find max socket value
 	for (std::vector<ConfigServer*>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
 		std::vector<int>	port = (*it)->getPorts();
-		Socket	*socket = new Socket(domain, service, protocol, port, interface, backlog);
-		std::vector<int>	tmp = socket->get_sockets();
+		Socket	*socket = new Socket(domain, service, protocol, port, interface, backlog, generation);
+		std::vector<int>	tmp = socket->getSockets();
 		for (std::vector<int>::iterator it2 = tmp.begin(); it2 != tmp.end(); ++it2) {
 			_socketServer[*it2] = *it;
 			_socket[*it2] = socket;
@@ -22,6 +23,7 @@ ws::Server::Server(int domain, int service, int protocol,
 			if (*it2 > _max_sd)
 				_max_sd = *it2;
 		}
+		++generation;
 	}
 	// Initialize set
 	FD_ZERO(&_master_set);
@@ -30,6 +32,7 @@ ws::Server::Server(int domain, int service, int protocol,
 		FD_SET((*it), &_master_set);
 	// Set timeout time for select; 3 mins in out case;
 	_timeout.tv_sec = 3 * 60;
+	// _timeout.tv_sec = 5;
 	_timeout.tv_usec = 0;
 }
 
@@ -39,8 +42,13 @@ ws::Server::Server(Server const &src) {
 
 ws::Server::~Server() {
 	std::map<int, Socket*>::iterator	it = _socket.begin();
-	for (; it != _socket.end(); ++it)
-		delete it->second;
+	int									prev_gen = 0;
+	for (; it != _socket.end(); ++it) {
+		if (prev_gen != it->second->getGeneration()) {
+			prev_gen = it->second->getGeneration();
+			delete it->second;
+		}
+	}
 }
 
 ws::Server&	ws::Server::operator=(Server const &rhs) {
@@ -64,7 +72,7 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 int		ws::Server::accepter(int sockfd) {
 	std::cout << "Accepting" << std::endl;
 	// error check for nonexisten _socket[sockfd]?
-	struct sockaddr_in	address = _socket[sockfd]->get_address();
+	struct sockaddr_in	address = _socket[sockfd]->getAddress();
 	int	new_sd;
 	int	addrlen = sizeof(address);
 

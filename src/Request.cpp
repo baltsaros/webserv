@@ -78,7 +78,8 @@ void	ws::Request::readBuffer() {
 		_errorCode = 405;
 		return ;
 	}
-	_body = _buffer.substr(crlf + 2);
+	_body = _buffer.substr(crlf + 4);
+	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	
@@ -161,6 +162,9 @@ void	ws::Request::_parseStartingLine() {
 }
 
 // Getters
+std::string	ws::Request::getBuffer() const			{return _buffer;}
+std::string	ws::Request::getHeader() const			{return _header;}
+std::string	ws::Request::getBody() const			{return _body;}
 std::string	ws::Request::getMethod() const			{return _method;}
 std::string	ws::Request::getTarget() const			{return _target;}
 std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
