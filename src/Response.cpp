@@ -24,7 +24,12 @@ void	ws::Response::createResponse() {
 	if (_req.getErrorCode() >= 0)
 		checkRequest();
 	else {
-		_response = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
+		if (checkExtension(_req.getTarget(), ".css"))
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: text/css\r\nContent-Length: ";
+		else if (checkExtension(_req.getTarget(), ".ico"))
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: image/x-icon\r\nContent-Length: ";
+		else
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
 		_msg = read_file(_req.getPath());
 		_response += std::to_string(_msg.size());
 		_response += "\r\n\r\n";

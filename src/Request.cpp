@@ -104,6 +104,7 @@ void	ws::Request::readBuffer() {
 
 void	ws::Request::_checkPath() {
 	bool		cssFlag = false;
+	bool		icoFlag = false;
 	// std::map<std::string, ConfigLocation *>	locations;
 
 	// locations = _config.getConfigServer()[0]->getLocation();
@@ -115,11 +116,12 @@ void	ws::Request::_checkPath() {
 	// 	root = locations["/"]->getRoot();
 
 	cssFlag = checkExtension(_target, ".css");
+	icoFlag = checkExtension(_target, ".ico");
 	// creating a filepath for recv(); if _target has .css extension
 	// it looks for /css location; if target is /, it returns a home page
 	// in all other cases it append _target to the root path
-	if (cssFlag)
-		_path = _locations["/css"]->getRoot();
+	if (cssFlag || icoFlag)
+		_path = _locations["/assets"]->getRoot() + _target;
 	else if (!_target.compare("/"))
 		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
 	else
