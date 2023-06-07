@@ -21,17 +21,19 @@ class Request {
 		std::string			_path;
 		std::string			_response;
 		int					_errorCode;
+		std::map<std::string, ConfigLocation *>	_locations;
 		void				_checkPos(size_t pos);
 		std::string			_getParam(std::string toGet, size_t offset);
+		void				_checkPath();
 		void				_parseStartingLine();
 
 	public:
 		Request();
-		Request(std::string buffer, Configuration config);
-		Request(Request const &src);
+		Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation*> locations);
+		Request(const Request &src);
 		~Request();
 
-		Request&	operator=(Request const &rhs);
+		Request&	operator=(const Request &rhs);
 		void	readBuffer();
 
 		// getters

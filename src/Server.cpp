@@ -4,14 +4,30 @@
 ws::Server::Server() {}
 
 ws::Server::Server(int domain, int service, int protocol,
-					int port, u_long interface, int backlog,
+					u_long interface, int backlog,
 					Configuration config) : _config(config) {
-	_socket = new Socket(domain, service, protocol, port, interface, backlog);
-	_max_sd = _socket->get_maxsd();
+	// get all servers from the confing
+	_servers = _config.getConfigServer();
+	_max_sd = 0;
+	// iterate every server block; create a socket for every port and then add the socket
+	// to the vector of sockets; find max socket value
+	for (std::vector<ConfigServer*>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+		std::vector<int>	port = (*it)->getPorts();
+		Socket	*socket = new Socket(domain, service, protocol, port, interface, backlog);
+		std::vector<int>	tmp = socket->get_sockets();
+		for (std::vector<int>::iterator it2 = tmp.begin(); it2 != tmp.end(); ++it2) {
+			_socketServer[*it2] = *it;
+			_socket[*it2] = socket;
+			_sockfds.push_back(*it2);
+			if (*it2 > _max_sd)
+				_max_sd = *it2;
+		}
+	}
 	// Initialize set
 	FD_ZERO(&_master_set);
-	// Add a new socket to the set
-	FD_SET(_socket->get_socket(), &_master_set);
+	// Add a new socket/sockets to the set
+	for (std::vector<int>::iterator it = _sockfds.begin(); it != _sockfds.end(); ++it)
+		FD_SET((*it), &_master_set);
 	// Set timeout time for select; 3 mins in out case;
 	_timeout.tv_sec = 3 * 60;
 	_timeout.tv_usec = 0;
@@ -22,33 +38,40 @@ ws::Server::Server(Server const &src) {
 }
 
 ws::Server::~Server() {
-	delete _socket;
+	std::map<int, Socket*>::iterator	it = _socket.begin();
+	for (; it != _socket.end(); ++it)
+		delete it->second;
 }
 
 ws::Server&	ws::Server::operator=(Server const &rhs) {
 	if (this != &rhs) {
 		_config = rhs._config;
 		_timeout = rhs._timeout;
-		_socket = rhs._socket;
 		_req = rhs._req;
-		_sockfd = rhs._sockfd;
+		_socket = rhs._socket;
+		_sockfds = rhs._sockfds;
 		_max_sd = rhs._max_sd;
 		_working_set = rhs._working_set;
 		_master_set = rhs._master_set;
+		_socketServer = rhs._socketServer;
+		_servers = rhs._servers;
 	}
 	return (*this);
 }
 
 // Accept a connection on our socket and creates a new socket ft that is linked to the original one
 // Receive a message from the socket _sockfd
-int		ws::Server::accepter() {
+int		ws::Server::accepter(int sockfd) {
 	std::cout << "Accepting" << std::endl;
-	struct sockaddr_in	address = _socket->get_address();
+	// error check for nonexisten _socket[sockfd]?
+	struct sockaddr_in	address = _socket[sockfd]->get_address();
+	int	new_sd;
 	int	addrlen = sizeof(address);
 
-	_sockfd = accept(_socket->get_socket(), (struct sockaddr *)&address,
+	new_sd = accept(sockfd, (struct sockaddr *)&address,
 			(socklen_t *)&addrlen);
-	return _sockfd;
+	_socketServer[new_sd] = _socketServer[sockfd];
+	return new_sd;
 }
 
 // Print the received message
@@ -75,7 +98,7 @@ int		ws::Server::handler(int i) {
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
 		// std::cout << _buf << std::endl;
-		Request req(_buf, _config);
+		Request req(_buf, _config, _socketServer[i]->getLocation());
 		_req = req;
 	}
 	return 1;
@@ -84,20 +107,11 @@ int		ws::Server::handler(int i) {
 // Send a response back
 int		ws::Server::responder(int i) {
 	int			ret;
-	// std::cout << "code: " << _req.getErrorCode() << std::endl;
-	if (_req.getErrorCode() >= 0)
-		ret = checkRequest(i);
-	else {
-		std::string	header = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
-		std::string	msg = read_file(_req.getPath());
-		std::string	response;
+	Response	response(_req, _config);
+	std::string	toSend;
 
-		response = header + std::to_string(msg.size());
-		response += "\r\n\r\n";
-		response += msg;
-		ret = write(i, response.c_str(), response.size());
-	}
-	// std::cout << to_send << std::endl;
+	toSend = response.getResponse();
+	ret = send(i, toSend.c_str(), toSend.size(), 0);
 	if (ret == -1) {
 		std::cerr << "Send() error" << std::endl;
 		return -1;
@@ -105,39 +119,14 @@ int		ws::Server::responder(int i) {
 	return ret;
 }
 
-// check for an error code and create an according response
-int		ws::Server::checkRequest(int i) {
-	int	errorCode = _req.getErrorCode();
-	std::map<int, std::string>	errorPath = _config.getConfigServer()[0]->getErrorPages();
-	int	ret = 0;
-	std::string error = read_file(errorPath[errorCode]);
-	std::string response;
-	switch (errorCode) {
-		case 400:
-			response = "HTTP/1.1 400 Bad Request\r\n";
-			break;
-		case 403:
-			response = "HTTP/1.1 403 Forbidden\r\n";
-			break;
-		case 404:
-			response = "HTTP/1.1 404 Not Found\r\n";
-			break;
-		case 405:
-			response = "HTTP/1.1 405 Method Not Allowed\r\n";
-			break;
-		default:
-			break;
+bool	ws::Server::checkSocket(int i) {
+	std::vector<int>::iterator	it;
+
+	for (it = _sockfds.begin(); it != _sockfds.end(); ++it) {
+		if (i == *it)
+			return true;
 	}
-	response += "Content-Type: text/html\r\n";
-	if (errorPath[errorCode].size() == 0) {
-		error = read_file("website/html/error_pages/default_error.html");
-		response = "HTTP/1.1 400 Bad Request\r\n";
-	}
-	response += "Content-Length: " + std::to_string(error.length()) + "\r\n";
-	response += "\r\n";
-	response += error;
-	ret = send(i, response.c_str(), response.size(), 0);
-	return (ret);
+	return false;
 }
 
 void	ws::Server::launcher() {
@@ -165,10 +154,10 @@ void	ws::Server::launcher() {
 			if (FD_ISSET(i, &_working_set)) {
 				sds_ready -= 1;
 				// check if i is the listening socket
-				if (i == _socket->get_socket()) {
+				if (checkSocket(i)) {
 					// if so, we need to accept all incoming connections
 					while (19) {
-						new_sd = accepter();
+						new_sd = accepter(i);
 						if (new_sd < 0) {
 							// EWOULDBLOCK in this case means that there are no more
 							// pending connections on the queue
@@ -242,6 +231,6 @@ void	ws::Server::test_connection(int to_test) {
 }
 
 // Getters
-ws::Socket*	ws::Server::get_server_sd() {
-	return (_socket);
-}
+std::map<int, ws::Socket*>		ws::Server::get_server_sd() {return _socket;}
+std::map<int, ConfigServer*>	ws::Server::getSocketServer() const {return _socketServer;}
+std::vector<ConfigServer*>		ws::Server::getServers() const {return _servers;}

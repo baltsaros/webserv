@@ -1,9 +1,10 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_errorCode = -1;}
-ws::Request::Request(std::string buffer, Configuration config)
+ws::Request::Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation *> locations)
 		: _buffer(buffer), _config(config) {
 	_errorCode = -1;
+	_locations = locations;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
@@ -70,6 +71,7 @@ void	ws::Request::readBuffer() {
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
+	// std::cout << "Header: " << _header << "\n";
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
@@ -100,12 +102,45 @@ void	ws::Request::readBuffer() {
 	// std::cout << "accept: " << _accept << std::endl;
 }
 
+void	ws::Request::_checkPath() {
+	bool		cssFlag = false;
+	// std::map<std::string, ConfigLocation *>	locations;
+
+	// locations = _config.getConfigServer()[0]->getLocation();
+
+	// check what root we use; for now i dont understand how to tackle this 
+	// std::string	root;
+	// root = _config.getConfigServer()[0]->getRoot();
+	// if (root.size() == 0)
+	// 	root = locations["/"]->getRoot();
+
+	cssFlag = checkExtension(_target, ".css");
+	// creating a filepath for recv(); if _target has .css extension
+	// it looks for /css location; if target is /, it returns a home page
+	// in all other cases it append _target to the root path
+	if (cssFlag)
+		_path = _locations["/css"]->getRoot();
+	else if (!_target.compare("/"))
+		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
+	else
+		_path = _locations["/"]->getRoot() + _target;
+	// simple check of whether we need to append ".html" to the filepath or not
+	if (!cssFlag && !checkExtension(_path, ".html"))
+		_path += ".html";
+	// std::cout << "target: " << _target << std::endl;
+	// std::cout << "path: " << _path << std::endl;
+	// std::cout << "exist: " << fileExists(_path) << std::endl;
+	// if file at _path does not exist, return error 404
+	if (!fileExists(_path))
+		_errorCode = 404;
+}
+
 // need to check for errors
 void	ws::Request::_parseStartingLine() {
 	size_t		pos;
 	size_t		start;
 	std::string file;
-	bool		cssFlag = false;
+	
 	
 	pos = _header.find(" ");
 	_method = _header.substr(0, pos);
@@ -117,17 +152,7 @@ void	ws::Request::_parseStartingLine() {
 	start = pos + 1;
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
-	// need to check every location for the config here
-	// std::cout << "target: " << _target << std::endl;
-	cssFlag = checkCssExtension(_target);
-	if (cssFlag)
-		_path = "website" + _target;
-	else
-		_path = "website/html/index.html";
-	if (_target.compare("/") && _target.compare("/index.html") && !cssFlag) {
-		_errorCode = 404;
-		return ;
-	}
+	_checkPath();
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
 	_protocolVersion = _header.substr(start, pos - start);

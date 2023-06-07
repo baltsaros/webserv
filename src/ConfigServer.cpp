@@ -11,7 +11,7 @@ ConfigServer::ConfigServer(std::string & content) {
 	// std::cout << this->_clientMaxBodySize << "\n";
 	// printMap(this->_errorPages);
 	// std::cout << "==============END SERVER================\n";
-	// std::cout << "location vector size: " << this->_vectLocations.size() << std::endl;
+	// std::cout << "location map size: " << this->_mapLocations.size() << std::endl;
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {
@@ -21,7 +21,7 @@ ConfigServer::ConfigServer(ConfigServer const & src) {
 
 ConfigServer::~ConfigServer() {
 	
-	this->_vectLocations.clear();
+	this->_mapLocations.clear();
 }
 
 /*
@@ -48,11 +48,11 @@ void	ConfigServer::createServerBlocks(std::string & content) {
 		else 
 			break ;
 	}
-	// for (int i = 0; i < this->_serverBlocks.size(); i++) {
-	// 	std::cout << this->_serverBlocks[i];
-	// 	std::cout << "\n=====================\n";
-	// 	std::cout << "end i: " << i << "\n";
-	// }
+// 	for (int i = 0; i < this->_serverBlocks.size(); i++) {
+// 		std::cout << this->_serverBlocks[i];
+// 		std::cout << "\n=====================\n";
+// 		// std::cout << "end i: " << i << "\n";
+// 	}
 }
 
 /*
@@ -219,12 +219,26 @@ void	ConfigServer::dispatch(std::pair<std::string, std::string> &pair) {
 }
 
 /*
+Extracts the path from the first line of the location block.
+@param : content of the location block.
+*/
+
+std::string	ConfigServer::extractLocPath(std::string & content) const {
+
+	size_t	posa = content.find(CHAR_SPACE);
+	size_t	posb = content.find(CHAR_SPACE, posa + 1);
+
+	return (content.substr(posa + 1, posb - posa - 1));
+}
+
+/*
 Parses the first server block and constructs the location blocks.
 */
 
 void	ConfigServer::parseServer() {
 
 	std::list<std::pair<std::string, std::string> >	list;
+	std::string										locPath;
 	
 	list = parseBlock(this->_serverBlocks[0]);
 	// for (std::list<std::pair<std::string, std::string> >::iterator	it = list.begin(); it != list.end(); it++)
@@ -235,7 +249,10 @@ void	ConfigServer::parseServer() {
 		dispatch(*it);
 	}
 	for (int i = 1; i < this->_serverBlocks.size(); i++) {
-		this->_vectLocations.push_back(new ConfigLocation(this->_serverBlocks[i]));
+		locPath = extractLocPath(this->_serverBlocks[i]);
+		// std::cout << "locPath " << i << ": " << locPath << "\n";
+		this->_mapLocations[locPath] = new ConfigLocation(this->_serverBlocks[i]);
+		// this->_vectLocations.push_back(new ConfigLocation(this->_serverBlocks[i]));
 	}
 }
 
@@ -279,9 +296,9 @@ std::vector<std::string>	ConfigServer::getServerBlocks(void) const {
 	return (this->_serverBlocks);
 }
 
-std::vector<ConfigLocation *>	ConfigServer::getLocation(void) const {
+std::map<std::string, ConfigLocation *>	ConfigServer::getLocation(void) const {
 
-	return (this->_vectLocations);
+	return (this->_mapLocations);
 }
 
 std::vector<int>	ConfigServer::getPorts(void) const {
