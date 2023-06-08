@@ -30,3 +30,31 @@ def test_invalid_method():
 	response = requests.request("TTT", url)
 	assert response.status_code == 405
 	assert response.text == expected_content
+
+def test_several_ports():
+	url2 = "http://localhost:9998"
+	response = requests.get(url)
+	assert response.status_code == 200
+	with open("../website/html/index.html") as file:
+		expected_content = file.read()
+	assert response.text == expected_content
+	
+	response = requests.get(url2)
+	assert response.status_code == 200
+	with open("../website/html/index.html") as file:
+		expected_content = file.read()
+	assert response.text == expected_content
+
+def test_several_servers():
+	url2 = "http://localhost:9997"
+	response = requests.get(url)
+	assert response.status_code == 200
+	with open("../website/html/index.html") as file:
+		expected_content = file.read()
+	assert response.text == expected_content
+	
+	response = requests.get(url2)
+	assert response.status_code == 200
+	with open("../website/html/index.html") as file:
+		expected_content = file.read()
+	assert response.text == expected_content
