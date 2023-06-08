@@ -10,7 +10,7 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "body: " << _body << std::endl;
 	// std::cout << "method: " << _method << std::endl;
 	// std::cout << "target: " << _target << std::endl;
-	// std::cout << "protocol: " << _protocolVersion << std::endl;
+	std::cout << "protocol: " << _protocolVersion << std::endl;
 	// std::cout << "host: " << _host << std::endl;
 	// std::cout << "uagent: " << _uAgent << std::endl;
 	// std::cout << "accept: " << _accept << std::endl;
@@ -150,6 +150,9 @@ void	ws::Request::_parseStartingLine() {
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
 	_protocolVersion = _header.substr(start, pos - start);
+	if ((_protocolVersion.compare("HTTP/1.0") && _protocolVersion.compare("HTTP/1.1"))
+		|| !_protocolVersion.size())
+		_returnStatus = 400;
 }
 
 // Getters
