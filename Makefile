@@ -26,7 +26,8 @@ SRCS		= main.cpp \
 				$(SRC_DIR)/Response.cpp \
 				$(SRC_DIR)/Server.cpp \
 				$(SRC_DIR)/ServerUtils.cpp \
-				$(SRC_DIR)/Socket.cpp
+				$(SRC_DIR)/Socket.cpp \
+				$(SRC_DIR)/CgiHandler.cpp
 
 OBJ_DIR		= objs
 OBJ_FILES	= $(SRCS:.cpp=.o)
