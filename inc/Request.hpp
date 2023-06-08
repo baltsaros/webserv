@@ -15,9 +15,10 @@ class Request {
 		std::string								_method;
 		std::string								_target;
 		std::string								_protocolVersion;
-		std::string								_host;
-		std::string								_uAgent;
-		std::string								_accept;
+		// std::string								_host;
+		// std::string								_uAgent;
+		// std::string								_accept;
+		std::map<std::string, std::string>		_headerFields;
 		std::string								_path;
 		std::string								_response;
 		int										_returnStatus;
@@ -26,6 +27,7 @@ class Request {
 		std::string								_getParam(std::string toGet, size_t offset);
 		void									_checkPath();
 		void									_parseStartingLine();
+		void									_parseHeaderFields();
 
 	public:
 		Request();
@@ -43,9 +45,9 @@ class Request {
 		std::string	getMethod() const;
 		std::string	getTarget() const;
 		std::string	getProtocol() const;
-		std::string	getHost() const;
-		std::string	getUAgent() const;
-		std::string	getAccept() const;
+		// std::string	getHost() const;
+		// std::string	getUAgent() const;
+		// std::string	getAccept() const;
 		std::string	getPath() const;
 		std::string	getResponse() const;
 		int			getReturnStatus() const;

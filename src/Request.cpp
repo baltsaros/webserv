@@ -10,7 +10,7 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "body: " << _body << std::endl;
 	// std::cout << "method: " << _method << std::endl;
 	// std::cout << "target: " << _target << std::endl;
-	std::cout << "protocol: " << _protocolVersion << std::endl;
+	// std::cout << "protocol: " << _protocolVersion << std::endl;
 	// std::cout << "host: " << _host << std::endl;
 	// std::cout << "uagent: " << _uAgent << std::endl;
 	// std::cout << "accept: " << _accept << std::endl;
@@ -32,9 +32,9 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_method = rhs._method;
 		_target = rhs._target;
 		_protocolVersion = rhs._protocolVersion;
-		_host = rhs._host;
-		_uAgent = rhs._uAgent;
-		_accept = rhs._accept;
+		// _host = rhs._host;
+		// _uAgent = rhs._uAgent;
+		// _accept = rhs._accept;
 		_path = rhs._path;
 		_response = rhs._response;
 		_returnStatus = rhs._returnStatus;
@@ -73,6 +73,7 @@ void	ws::Request::readBuffer() {
 	}
 	_header = _buffer.substr(0, crlf);
 	// std::cout << "Header: " << _header << "\n";
+	// std::cout << "============" << "\n";
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
@@ -83,17 +84,18 @@ void	ws::Request::readBuffer() {
 	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
+	_parseHeaderFields();
 	
 	//check for other parameters
-	pos = _buffer.find("Host: ");
-	if (pos != std::string::npos)
-		_host = _getParam("Host: ", 6);
-	pos = _buffer.find("User-Agent: ");
-	if (pos != std::string::npos)
-		_uAgent = _getParam("User-Agent: ", 12);
-	pos = _buffer.find("Accept: ");
-	if (pos != std::string::npos)
-		_accept = _getParam("Accept: ", 8);
+	// pos = _buffer.find("Host: ");
+	// if (pos != std::string::npos)
+	// 	_host = _getParam("Host: ", 6);
+	// pos = _buffer.find("User-Agent: ");
+	// if (pos != std::string::npos)
+	// 	_uAgent = _getParam("User-Agent: ", 12);
+	// pos = _buffer.find("Accept: ");
+	// if (pos != std::string::npos)
+	// 	_accept = _getParam("Accept: ", 8);
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
 	// std::cout << "method: " << _method << std::endl;
@@ -155,6 +157,34 @@ void	ws::Request::_parseStartingLine() {
 		_returnStatus = 400;
 }
 
+void	ws::Request::_parseHeaderFields() {
+	size_t								pos, pos1, pos2;
+	std::pair<std::string, std::string>	pair;
+
+	pos = _header.find("\r\n");
+	pos = pos + 2;
+	std::string	content = _header.substr(pos);
+	std::cout << "content:\n" << content;
+	while (pos != std::string::npos) {
+		pos1 = content.find(":", pos);
+		if (pos1 == std::string::npos) {
+			_returnStatus = 400;
+			return ;
+		}
+		pair.first = content.substr(pos, pos1 - pos);
+		std::cout << "first: " << pair.first << std::endl;
+		pos2 = content.find(" ", pos1);
+		if (pos2 == std::string::npos) {
+			_returnStatus = 400;
+			return ;
+		}
+		pos = content.find("\n", pos2);
+		pair.second = content.substr(pos2 + 1, pos - pos2 - 1);
+		std::cout << "second: " << pair.second << std::endl;
+		this->_headerFields.insert(pair);   
+	}
+}
+
 // Getters
 std::string	ws::Request::getBuffer() const			{return _buffer;}
 std::string	ws::Request::getHeader() const			{return _header;}
@@ -162,9 +192,9 @@ std::string	ws::Request::getBody() const			{return _body;}
 std::string	ws::Request::getMethod() const			{return _method;}
 std::string	ws::Request::getTarget() const			{return _target;}
 std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
-std::string	ws::Request::getHost() const			{return _host;}
-std::string	ws::Request::getUAgent() const			{return _uAgent;}
-std::string	ws::Request::getAccept() const			{return _accept;}
+// std::string	ws::Request::getHost() const			{return _host;}
+// std::string	ws::Request::getUAgent() const			{return _uAgent;}
+// std::string	ws::Request::getAccept() const			{return _accept;}
 std::string	ws::Request::getPath() const			{return _path;}
 std::string	ws::Request::getResponse() const		{return _response;}
 int			ws::Request::getReturnStatus() const	{return _returnStatus;}
