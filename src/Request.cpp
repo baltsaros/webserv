@@ -1,9 +1,9 @@
 #include "../inc/Request.hpp"
 
-ws::Request::Request() {_errorCode = -1;}
+ws::Request::Request() {_returnStatus = -1;}
 ws::Request::Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation *> locations)
 		: _buffer(buffer), _config(config) {
-	_errorCode = -1;
+	_returnStatus = -1;
 	_locations = locations;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
@@ -14,7 +14,7 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "host: " << _host << std::endl;
 	// std::cout << "uagent: " << _uAgent << std::endl;
 	// std::cout << "accept: " << _accept << std::endl;
-	// std::cout << "code: " << _errorCode << std::endl;
+	// std::cout << "code: " << _returnStatus << std::endl;
 }
 
 ws::Request::Request(Request const &src) {
@@ -37,7 +37,8 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_accept = rhs._accept;
 		_path = rhs._path;
 		_response = rhs._response;
-		_errorCode = rhs._errorCode;
+		_returnStatus = rhs._returnStatus;
+		_locations = rhs._locations;
 	}
 	return (*this);
 }
@@ -67,7 +68,7 @@ void	ws::Request::readBuffer() {
 	crlf = _buffer.find("\r\n\r\n");
 	if (crlf == std::string::npos || !_buffer.size()) {
 		std::cerr << "Nothing was found" << std::endl;
-		_errorCode = 400;
+		_returnStatus = 400;
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
@@ -75,10 +76,11 @@ void	ws::Request::readBuffer() {
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
-		_errorCode = 405;
+		_returnStatus = 405;
 		return ;
 	}
-	_body = _buffer.substr(crlf + 2);
+	_body = _buffer.substr(crlf + 4);
+	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	
@@ -104,35 +106,28 @@ void	ws::Request::readBuffer() {
 
 void	ws::Request::_checkPath() {
 	bool		cssFlag = false;
-	// std::map<std::string, ConfigLocation *>	locations;
+	bool		icoFlag = false;
 
-	// locations = _config.getConfigServer()[0]->getLocation();
-
-	// check what root we use; for now i dont understand how to tackle this 
-	// std::string	root;
-	// root = _config.getConfigServer()[0]->getRoot();
-	// if (root.size() == 0)
-	// 	root = locations["/"]->getRoot();
-
-	cssFlag = checkExtension(_target, ".css");
-	// creating a filepath for recv(); if _target has .css extension
-	// it looks for /css location; if target is /, it returns a home page
-	// in all other cases it append _target to the root path
-	if (cssFlag)
-		_path = _locations["/css"]->getRoot();
+	cssFlag = ws::checkExtension(_target, ".css");
+	icoFlag = ws::checkExtension(_target, ".ico");
+	// creating a filepath for recv(); if _target has .css/.ico extension
+	// it looks for /assets location; if target is /, it returns a home page
+	// in all other cases it appends _target to the root path
+	if (cssFlag || icoFlag)
+		_path = _locations["/assets"]->getRoot() + _target;
 	else if (!_target.compare("/"))
 		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
 	else
 		_path = _locations["/"]->getRoot() + _target;
 	// simple check of whether we need to append ".html" to the filepath or not
-	if (!cssFlag && !checkExtension(_path, ".html"))
+	if (!cssFlag && !ws::checkExtension(_path, ".html"))
 		_path += ".html";
 	// std::cout << "target: " << _target << std::endl;
 	// std::cout << "path: " << _path << std::endl;
 	// std::cout << "exist: " << fileExists(_path) << std::endl;
 	// if file at _path does not exist, return error 404
-	if (!fileExists(_path))
-		_errorCode = 404;
+	if (!ws::fileExists(_path))
+		_returnStatus = 404;
 }
 
 // need to check for errors
@@ -140,13 +135,12 @@ void	ws::Request::_parseStartingLine() {
 	size_t		pos;
 	size_t		start;
 	std::string file;
-	
-	
+
 	pos = _header.find(" ");
 	_method = _header.substr(0, pos);
 	if ((_method.compare("GET") && _method.compare("POST")
 		&& _method.compare("DELETE")) || !_method.size()) {
-		_errorCode = 405;
+		_returnStatus = 405;
 		return ;
 	}
 	start = pos + 1;
@@ -159,6 +153,9 @@ void	ws::Request::_parseStartingLine() {
 }
 
 // Getters
+std::string	ws::Request::getBuffer() const			{return _buffer;}
+std::string	ws::Request::getHeader() const			{return _header;}
+std::string	ws::Request::getBody() const			{return _body;}
 std::string	ws::Request::getMethod() const			{return _method;}
 std::string	ws::Request::getTarget() const			{return _target;}
 std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
@@ -167,4 +164,4 @@ std::string	ws::Request::getUAgent() const			{return _uAgent;}
 std::string	ws::Request::getAccept() const			{return _accept;}
 std::string	ws::Request::getPath() const			{return _path;}
 std::string	ws::Request::getResponse() const		{return _response;}
-int			ws::Request::getErrorCode() const		{return _errorCode;}
+int			ws::Request::getReturnStatus() const	{return _returnStatus;}

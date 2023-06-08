@@ -14,9 +14,9 @@ int	main(int argc, char **argv) {
 
 	// std::map<int, std::string>	errors = config.getConfigServer()[0]->getErrorPages();
 	// printMap(errors);
-	std::map<std::string, ConfigLocation*>	locs = config.getConfigServer()[0]->getLocation();
+	// std::map<std::string, ConfigLocation*>	locs = config.getConfigServer()[0]->getLocation();
 	// std::map<std::string, ConfigLocation*>	locs2 = config.getConfigServer()[1]->getLocation();
-	// std::cout << "root css: " << locs["/css"]->getRoot() << std::endl;
+	// std::cout << "root css: " << locs["/assets"]->getRoot() << std::endl;
 	// std::cout << "root /: " << locs["/"]->getRoot() << std::endl;
 
 	config.getConfigServer()[0];

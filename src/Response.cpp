@@ -21,11 +21,16 @@ ws::Response&	ws::Response::operator=(const Response &rhs) {
 }
 
 void	ws::Response::createResponse() {
-	if (_req.getErrorCode() >= 0)
+	if (_req.getReturnStatus() >= 0)
 		checkRequest();
 	else {
-		_response = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
-		_msg = read_file(_req.getPath());
+		if (ws::checkExtension(_req.getTarget(), ".css"))
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: text/css\r\nContent-Length: ";
+		else if (ws::checkExtension(_req.getTarget(), ".ico"))
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: image/x-icon\r\nContent-Length: ";
+		else
+			_response = "HTTP/1.1 200 OK\r\nContent-Type: text\r\nContent-Length: ";
+		_msg = ws::readFile(_req.getPath());
 		_response += std::to_string(_msg.size());
 		_response += "\r\n\r\n";
 		_response += _msg;
@@ -34,10 +39,10 @@ void	ws::Response::createResponse() {
 
 // check for an error code and create an according response
 void	ws::Response::checkRequest() {
-	int	errorCode = _req.getErrorCode();
+	int	returnStatus = _req.getReturnStatus();
 	std::map<int, std::string>	errorPath = _config.getConfigServer()[0]->getErrorPages();
-	_msg = read_file(errorPath[errorCode]);
-	switch (errorCode) {
+	_msg = ws::readFile(errorPath[returnStatus]);
+	switch (returnStatus) {
 		case 400:
 			_response = "HTTP/1.1 400 Bad Request\r\n";
 			break;
@@ -53,9 +58,8 @@ void	ws::Response::checkRequest() {
 		default:
 			break;
 	}
-	// if (errorPath[errorCode].size() == 0) {
 	if (_msg.size() == 0) {
-		_msg = read_file("website/html/error_pages/default_error.html");
+		_msg = ws::readFile("website/html/error_pages/default_error.html");
 		_response = "HTTP/1.1 400 Bad Request\r\n";
 	}
 	_response += "Content-Type: text/html\r\n";
