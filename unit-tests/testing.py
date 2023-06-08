@@ -2,6 +2,7 @@
 # need to create venv: python3 -m venv env
 # then activate it: source env/bin/activate
 # to run: pytest testing.py
+# might also need to install requests module: pip3 install requests
 
 import unittest
 import requests
@@ -12,17 +13,19 @@ error4 = "http://localhost:9999/bad"
 def test_root_url():
 	response = requests.get(url)
 	assert response.status_code == 200
-	assert response.text == "Testing"
+	with open("../website/html/index.html") as file:
+		expected_content = file.read()
+	assert response.text == expected_content
 
 def test_nonexistent_page():
 	response = requests.get(error4)
-	with open("../web/error_pages/404.html") as file:
+	with open("../website/html/error_pages/404.html") as file:
 		expected_content = file.read()
 	assert response.status_code == 404
 	assert response.text == expected_content
 
 def test_invalid_method():
-	with open("../web/error_pages/405.html") as file:
+	with open("../website/html/error_pages/405.html") as file:
 		expected_content = file.read()
 	response = requests.request("TTT", url)
 	assert response.status_code == 405
