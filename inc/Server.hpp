@@ -17,20 +17,20 @@
 namespace	ws {
 class Server {
 	private:
-		struct timeval		_timeout;
-		std::map<int, Socket*>	_socket;
-		std::vector<int>	_sockfds;
-		Request				_req;
-		Configuration		_config;
-		int					_max_sd;
-		std::string			_buf;
-		fd_set				_working_set, _master_set;
+		struct timeval					_timeout;
+		std::map<int, Socket*>			_socket;
+		std::vector<int>				_sockfds;
+		Request							_req;
+		Configuration					_config;
+		int								_max_sd;
+		std::string						_buf;
+		fd_set							_working_set, _master_set;
 		std::map<int, ConfigServer*>	_socketServer;
-		std::vector<ConfigServer*>	_servers;
-		int					accepter(int sockfd);
-		int					handler(int i);
-		int					responder(int i);
-		bool				checkSocket(int i);
+		std::vector<ConfigServer*>		_servers;
+		int								_accepter(int sockfd);
+		int								_handler(int sockfd);
+		int								_responder(int sockfd);
+		bool							_checkSocket(int sockfd);
 
 	public:
 		Server();
@@ -40,10 +40,12 @@ class Server {
 		Server(const Server &src);
 		~Server();
 
-		Server&	operator=(const Server &rhs);
-		void	launcher();
-		void	test_connection(int to_test);
-		std::map<int, ws::Socket*>			get_server_sd();
+		Server&							operator=(const Server &rhs);
+		void							launcher();
+		void							test_connection(int to_test);
+
+		// getters
+		std::map<int, ws::Socket*>		getServerSd();
 		std::map<int, ConfigServer*>	getSocketServer() const;
 		std::vector<ConfigServer*>		getServers() const;
 };

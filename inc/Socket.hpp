@@ -29,7 +29,11 @@ class Socket {
 		Socket&				operator=(const Socket &rhs);
 		void				connect_to_network(int sockfd);
 		void				test_connection(int to_test);
+
+		// setters
 		void				setGeneration(int generation);
+
+		// getters
 		struct sockaddr_in	getAddress() const;
 		std::vector<int>	getSockets() const;
 		int					getMaxsd() const;

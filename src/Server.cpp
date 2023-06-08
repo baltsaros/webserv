@@ -43,6 +43,7 @@ ws::Server::Server(Server const &src) {
 ws::Server::~Server() {
 	std::map<int, Socket*>::iterator	it = _socket.begin();
 	int									prev_gen = 0;
+
 	for (; it != _socket.end(); ++it) {
 		if (prev_gen != it->second->getGeneration()) {
 			prev_gen = it->second->getGeneration();
@@ -59,6 +60,7 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 		_socket = rhs._socket;
 		_sockfds = rhs._sockfds;
 		_max_sd = rhs._max_sd;
+		_buf = rhs._buf;
 		_working_set = rhs._working_set;
 		_master_set = rhs._master_set;
 		_socketServer = rhs._socketServer;
@@ -69,7 +71,7 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 
 // Accept a connection on our socket and creates a new socket ft that is linked to the original one
 // Receive a message from the socket _sockfd
-int		ws::Server::accepter(int sockfd) {
+int		ws::Server::_accepter(int sockfd) {
 	std::cout << "Accepting" << std::endl;
 	// error check for nonexisten _socket[sockfd]?
 	struct sockaddr_in	address = _socket[sockfd]->getAddress();
@@ -83,7 +85,7 @@ int		ws::Server::accepter(int sockfd) {
 }
 
 // Print the received message
-int		ws::Server::handler(int i) {
+int		ws::Server::_handler(int sockfd) {
 	std::cout << "Reading" << std::endl;
 	_buf.clear();
 	char	cbuf[BUFFER_SIZE];
@@ -91,7 +93,7 @@ int		ws::Server::handler(int i) {
 	// keep reading incoming data until there is nothing left to read
 	do {
 		// With MSG_DONTWAIT recv won't block socket if there is nothing to read
-		bytesRead = recv(i, cbuf, BUFFER_SIZE - 1, MSG_DONTWAIT);
+		bytesRead = recv(sockfd, cbuf, BUFFER_SIZE - 1, MSG_DONTWAIT);
 		if (bytesRead > 0) {
 			cbuf[bytesRead] = '\0';
 			_buf += cbuf;
@@ -106,20 +108,20 @@ int		ws::Server::handler(int i) {
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
 		// std::cout << _buf << std::endl;
-		Request req(_buf, _config, _socketServer[i]->getLocation());
+		Request req(_buf, _config, _socketServer[sockfd]->getLocation());
 		_req = req;
 	}
 	return 1;
 }
 
 // Send a response back
-int		ws::Server::responder(int i) {
+int		ws::Server::_responder(int sockfd) {
 	int			ret;
 	Response	response(_req, _config);
 	std::string	toSend;
 
 	toSend = response.getResponse();
-	ret = send(i, toSend.c_str(), toSend.size(), 0);
+	ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
 	if (ret == -1) {
 		std::cerr << "Send() error" << std::endl;
 		return -1;
@@ -127,11 +129,11 @@ int		ws::Server::responder(int i) {
 	return ret;
 }
 
-bool	ws::Server::checkSocket(int i) {
+bool	ws::Server::_checkSocket(int sockfd) {
 	std::vector<int>::iterator	it;
 
 	for (it = _sockfds.begin(); it != _sockfds.end(); ++it) {
-		if (i == *it)
+		if (sockfd == *it)
 			return true;
 	}
 	return false;
@@ -162,10 +164,10 @@ void	ws::Server::launcher() {
 			if (FD_ISSET(i, &_working_set)) {
 				sds_ready -= 1;
 				// check if i is the listening socket
-				if (checkSocket(i)) {
+				if (_checkSocket(i)) {
 					// if so, we need to accept all incoming connections
 					while (19) {
-						new_sd = accepter(i);
+						new_sd = _accepter(i);
 						if (new_sd < 0) {
 							// EWOULDBLOCK in this case means that there are no more
 							// pending connections on the queue
@@ -191,7 +193,7 @@ void	ws::Server::launcher() {
 					close_conn = false;
 					while (19) {
 						// receive all incoming data
-						ret = handler(i);
+						ret = _handler(i);
 						if (!ret) {
 							close_conn = true;
 							break ;
@@ -199,7 +201,7 @@ void	ws::Server::launcher() {
 						else if (ret == -1)
 							break ;
 						// send response back to the client
-						ret = responder(i);
+						ret = _responder(i);
 						if (ret == -1) {
 							close_conn = true;
 							break ;
@@ -239,6 +241,6 @@ void	ws::Server::test_connection(int to_test) {
 }
 
 // Getters
-std::map<int, ws::Socket*>		ws::Server::get_server_sd() {return _socket;}
+std::map<int, ws::Socket*>		ws::Server::getServerSd() {return _socket;}
 std::map<int, ConfigServer*>	ws::Server::getSocketServer() const {return _socketServer;}
 std::vector<ConfigServer*>		ws::Server::getServers() const {return _servers;}
