@@ -3,8 +3,11 @@
 # then activate it: source env/bin/activate
 # to run: pytest testing.py
 # might also need to install requests module: pip3 install requests
+# and pip3 install httpx
+# on school computers i also had to install with brew: brew install httpx
 
 import unittest
+# import httpx
 import requests
 
 url = "http://localhost:9999"
@@ -58,3 +61,12 @@ def test_several_servers():
 	with open("../website/html/index.html") as file:
 		expected_content = file.read()
 	assert response.text == expected_content
+
+# def test_hhtp2_request():
+# 	with httpx.Client(http2=True) as client:
+# 		response = client.get(url)
+# 	with open("../website/html/error_pages/400.html") as file:
+# 		expected_content = file.read()
+# 	assert response.status_code == 400
+# 	assert response.text == expected_content
+	
