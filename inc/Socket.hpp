@@ -4,6 +4,7 @@
 # include <netinet/in.h> // some macros for socket
 # include <netdb.h> // getaddrinfo
 # include <string.h> // strerror
+# include <vector>
 # include <fcntl.h>
 # include <iostream>
 
@@ -11,24 +12,32 @@ namespace	ws {
 
 class Socket {
 	private:
-		int					_sockfd, _max_sd;
+		std::vector<int>	_sockfds;
+		int					_max_sd;
 		int					_backlog;
+		int					_generation;
 		struct sockaddr_in	_address;
 		// fd_set				_master_set;
 
 	public:
 		Socket();
-		Socket(int domain, int service, int protocol, int port,
-				u_long interface, int backlog);
-		Socket(Socket const &src);
+		Socket(int domain, int service, int protocol, std::vector<int> port,
+				u_long interface, int backlog, int generation);
+		Socket(const Socket &src);
 		~Socket();
 
-		Socket&				operator=(Socket const &rhs);
-		void				connect_to_network();
+		Socket&				operator=(const Socket &rhs);
+		void				connect_to_network(int sockfd);
 		void				test_connection(int to_test);
-		struct sockaddr_in	get_address() const;
-		int					get_socket() const;
-		int					get_maxsd() const;
+
+		// setters
+		void				setGeneration(int generation);
+
+		// getters
+		struct sockaddr_in	getAddress() const;
+		std::vector<int>	getSockets() const;
+		int					getMaxsd() const;
+		int					getGeneration() const;
 		// fd_set				get_masterset() const;
 };
 
