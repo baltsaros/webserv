@@ -11,6 +11,7 @@
 # include "Response.hpp"
 # include "Configuration.hpp"
 # include "ServerUtils.hpp"
+# include "CgiHandler.hpp"
 
 # define BUFFER_SIZE 4096 // should be more than 4
 

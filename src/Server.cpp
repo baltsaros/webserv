@@ -120,11 +120,19 @@ int		ws::Server::_responder(int sockfd) {
 	Response	response(_req, _config);
 	std::string	toSend;
 
-	toSend = response.getResponse();
-	ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
-	if (ret == -1) {
-		std::cerr << "Send() error" << std::endl;
-		return -1;
+	if (this->_req.getMethod() == "POST")
+	{
+		CgiHandler cgi = CgiHandler(_req, sockfd);
+		cgi.execute();
+		ret = 1;
+	}
+	else {
+		toSend = response.getResponse();
+		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
+		if (ret == -1) {
+			std::cerr << "Send() error" << std::endl;
+			return -1;
+		}
 	}
 	return ret;
 }

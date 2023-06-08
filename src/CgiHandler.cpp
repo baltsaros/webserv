@@ -39,11 +39,6 @@ std::string	ws::CgiHandler::getExecutable(void) const
 	return (this->_executable);
 }
 
-int			ws::CgiHandler::getSocketFd(void) const
-{
-	return (this->_socketFd);
-}
-
 std::map<std::string, std::string>	ws::CgiHandler::getEnvVariables(void) const
 {
 	return (this->_envVariables);
@@ -57,45 +52,48 @@ void	ws::CgiHandler::execute(void)
 {
 	this->_envVariables[CONTENT_TYPE] = "application/x-www-form-urlencoded";
 	std::string plop = "CONTENT_TYPE=application/x-www-form-urlencoded";
-	char *env[] = {&plop[0], NULL};
+	std::string method = "REQUEST_METHOD=POST";
+	//std::string length = "CONTENT_LENGTH=27";
+	char *env[] = {&plop[0], &method[0], NULL};
+	int pipe_in[2];
+	int pipe_out[2];
 
-	if (pipe(this->_pipe_in) < 0)
+	if (pipe(pipe_in) < 0)
 		return ;
-	if (pipe(this->_pipe_out) < 0)
+	if (pipe(pipe_out) < 0)
 		return ;
-		std::cout << this->_req.getBody() << "\n";
-	this->_pid = fork();
-	if (this->_pid == 0) //child
+	int pid = fork();
+	if (pid == 0) //child
 	{
-		close(this->_pipe_in[1]);
-		close(this->_pipe_out[0]);
-		//std::cout << this->_req.getTarget() << "\n";
-		dup2(this->_pipe_in[0], STDIN_FILENO);
-		close(this->_pipe_in[0]);
-		dup2(this->_pipe_out[1], STDOUT_FILENO);
-		close(this->_pipe_out[1]);
+		close(pipe_in[1]);
+		close(pipe_out[0]);
+		dup2(pipe_in[0], STDIN_FILENO);
+		close(pipe_in[0]);
+
+		dup2(pipe_out[1], STDOUT_FILENO);
+		close(pipe_out[1]);
 		execve("src/cgi-bin/calculator.py", NULL, env);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
-		close(this->_pipe_in[0]);
-		close(this->_pipe_out[1]);
+		int ret;
+		close(pipe_in[0]);
+		close(pipe_out[1]);
 		std::string body = this->_req.getBody();
-		write(this->_pipe_in[1], body.c_str(), body.size());
-		close(this->_pipe_in[1]);
+		write(pipe_in[1], body.c_str(), body.size());
+		close(pipe_in[1]);
+
 		char buf[BUFFER_LENGTH];
-		int	ret;
-		//std::cout << "HAHAHAH\n";
-		while((ret = read(this->_pipe_out[0], buf, BUFFER_LENGTH)))
+		std::string toRet;
+
+		while((ret = read(pipe_out[0], buf, BUFFER_LENGTH - 1)))
 		{
-			write(this->_socketFd, buf, ret);
-			//std::cout << "plop======" << buf << "\n";
+			toRet = buf;
+			send(this->_socketFd, toRet.c_str(), toRet.size(), 0);
 		}
-		close(this->_pipe_out[0]);
-		//std::cout << "fourt\n";
-		waitpid(this->_pid, NULL, 0);
-		//write(this->_pipe_in[1], body.c_str(), body.size());
+		close(pipe_out[0]);
+		waitpid(pid, NULL, 0);
 	}
-} 
+}
