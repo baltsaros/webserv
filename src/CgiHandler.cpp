@@ -1,13 +1,12 @@
 #include "../inc/CgiHandler.hpp"
 
-ws::CgiHandler::CgiHandler()
-{
-}
-
+//Destructor
 ws::CgiHandler::~CgiHandler()
 {
+	this->_envVariables.clear();
 }
 
+//Constructor
 ws::CgiHandler::CgiHandler(ws::Request req, int socketFd)
 {
 	this->_req = req;
@@ -15,11 +14,13 @@ ws::CgiHandler::CgiHandler(ws::Request req, int socketFd)
 	CgiHandler::initializeEnv();
 }
 
+//Copy constructor
 ws::CgiHandler::CgiHandler(CgiHandler const & src)
 {
-	
+	*this = src;
 }
 
+//Override = operator
 ws::CgiHandler & ws::CgiHandler::operator=(CgiHandler const & rhs)
 {
 	if (this != &rhs)
@@ -32,42 +33,77 @@ ws::CgiHandler & ws::CgiHandler::operator=(CgiHandler const & rhs)
 	return (*this);
 }
 
+/*
+** Getter fot the request field.
+** @return : request : request 
+*/
 ws::Request	 ws::CgiHandler::getRequest(void) const
 {
 	return (this->_req);
 }
 
+/*
+** Getter for the executable fields.
+** @return : executable : std::string 
+*/
 std::string	ws::CgiHandler::getExecutable(void) const
 {
 	return (this->_executable);
 }
 
+/*
+** Getter for the environement variables fields.
+** @return : envVariables : std::map<std::string, std::string> 
+*/
 std::map<std::string, std::string>	ws::CgiHandler::getEnvVariables(void) const
 {
 	return (this->_envVariables);
 }
 
+/*
+** Getter for the socketFd fields.
+** @return : socketFd : int 
+*/
 int	ws::CgiHandler::getSocketFd(void) const
 {
 	return (this->_socketFd);
 }
 
+/*
+** Create the association between a field and it's value for the CGI environment
+**	variables.
+** @param :	std::string leftString the name of the variable
+**			std::string 
+*/
+std::string	ws::CgiHandler::createEnvString(std::string leftString, std::string righString)
+{
+	return (leftString + "=" + righString);
+}
+/*
+** Initialise all the environment variables for the cgi.
+*/
 void	ws::CgiHandler::initializeEnv(void)
 {
-	this->_envVariables[CONTENT_TYPE] = CONTENT_TYPE + (std::string)"=application/x-www-form-urlencoded";
-	this->_envVariables[CONTENT_LENGTH] = CONTENT_LENGTH + (std::string)"=" + std::to_string(this->_req.getBody().size());
-	this->_envVariables[HTTP_USER_AGENT] = HTTP_USER_AGENT + (std::string)"=" + this->_req.getUAgent();
-	this->_envVariables[PATH_INFO] = PATH_INFO + (std::string)"=" + this->_req.getTarget();
-	this->_envVariables[REQUEST_METHOD] = REQUEST_METHOD + (std::string)"=" + this->_req.getMethod();
-	this->_envVariables[SCRIPT_FILENAME] = SCRIPT_FILENAME + (std::string)"=" + this->_req.getTarget();
-	this->_envVariables[SCRIPT_NAME] = SCRIPT_NAME + (std::string)"=" + this->_req.getTarget(); 
-	this->_envVariables[SERVER_PROTOCOL] = SERVER_PROTOCOL + (std::string)"="+ this->_req.getProtocol();
-
+	this->_envVariables[CONTENT_TYPE] = createEnvString(CONTENT_TYPE, this->_req.getHeaderFields()[CONTENT_TYPE_FIELD]);
+	this->_envVariables[CONTENT_LENGTH] = createEnvString(CONTENT_LENGTH, std::to_string(this->_req.getBody().size()));
+	this->_envVariables[HTTP_USER_AGENT] = createEnvString(HTTP_USER_AGENT, this->_req.getHeaderFields()[USER_AGENT_FIELD]);
+	this->_envVariables[PATH_INFO] = createEnvString(PATH_INFO, this->_req.getTarget());
+	this->_envVariables[REQUEST_METHOD] = createEnvString(REQUEST_METHOD, this->_req.getMethod());
+	this->_envVariables[SCRIPT_FILENAME] = createEnvString(SCRIPT_FILENAME, this->_req.getTarget());
+	this->_envVariables[SCRIPT_NAME] = createEnvString(SCRIPT_NAME, this->_req.getTarget());
+	this->_envVariables[SERVER_PROTOCOL] = createEnvString(SERVER_PROTOCOL, this->_req.getProtocol());
 }
 
+/*
+** Execute the cgi script.
+** The function is divide in two processes with a fork.
+** The child process is used to execute the cgi script with execve and send
+**	back the response to the parent process through pipes.
+** The parent function is used to send the data to the child process and get 
+**	the response back to write it through the socket fd.
+*/
 void	ws::CgiHandler::execute(void)
 {
-	//this->_envVariables[CONTENT_TYPE] = "application/x-www-form-urlencoded";
 	char *env[] = {&this->_envVariables[CONTENT_TYPE][0],
 					&this->_envVariables[CONTENT_LENGTH][0],
 					&this->_envVariables[HTTP_USER_AGENT][0],
@@ -75,9 +111,13 @@ void	ws::CgiHandler::execute(void)
 					&this->_envVariables[REQUEST_METHOD][0],
 					&this->_envVariables[SCRIPT_FILENAME][0],
 					&this->_envVariables[SCRIPT_NAME][0],
+					&this->_envVariables[SERVER_PROTOCOL][0],
 					NULL};
 	int pipe_in[2];
 	int pipe_out[2];
+
+	//Erase the first charactrer which is '/'. If not, execve will failed.
+	std::string newTarget = this->_req.getTarget().erase(0, 1);
 
 	if (pipe(pipe_in) < 0)
 		return ;
@@ -93,7 +133,7 @@ void	ws::CgiHandler::execute(void)
 
 		dup2(pipe_out[1], STDOUT_FILENO);
 		close(pipe_out[1]);
-		execve("src/cgi-bin/calculator.py", NULL, env);
+		execve(newTarget.c_str(), NULL, env);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}

@@ -16,8 +16,11 @@
 # define PATH_INFO "PATH_INFO"
 # define SCRIPT_FILENAME "SCRIPT_FILENAME"
 # define SCRIPT_NAME "SCRIPT_NAME"
+# define USER_AGENT_FIELD "User-Agent"
+# define CONTENT_TYPE_FIELD "Content-Type"
 
 # define BUFFER_LENGTH 1024
+
 class Request;
 
 namespace ws {
@@ -32,9 +35,10 @@ class CgiHandler
 		int									_socketFd;
 
 		void initializeEnv(void);
+		std::string	createEnvString(std::string leftString, std::string righString);
+		CgiHandler();
 
 	public:
-		CgiHandler();
 		CgiHandler(Request req, int socketFd);
 		~CgiHandler();
 		CgiHandler(CgiHandler const & src);
