@@ -85,10 +85,10 @@ void	ws::CgiHandler::execute(void)
 		write(pipe_in[1], body.c_str(), body.size());
 		close(pipe_in[1]);
 
-		char buf[BUFFER_LENGTH];
+		char buf[30000];
 		std::string toRet;
 
-		while((ret = read(pipe_out[0], buf, BUFFER_LENGTH - 1)))
+		while((ret = read(pipe_out[0], buf, 1000)))
 		{
 			toRet = buf;
 			send(this->_socketFd, toRet.c_str(), toRet.size(), 0);
