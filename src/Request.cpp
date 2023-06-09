@@ -11,10 +11,6 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "method: " << _method << std::endl;
 	// std::cout << "target: " << _target << std::endl;
 	// std::cout << "protocol: " << _protocolVersion << std::endl;
-	// std::cout << "host: " << _host << std::endl;
-	// std::cout << "uagent: " << _uAgent << std::endl;
-	// std::cout << "accept: " << _accept << std::endl;
-	// std::cout << "code: " << _returnStatus << std::endl;
 	// std::cout << "Headerfields:\n";
 	// printMapStrings(_headerFields);
 	// std::cout << std::endl;
@@ -86,14 +82,6 @@ void	ws::Request::readBuffer() {
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	_parseHeaderFields();
-	// std::cout << "header: " << _header << std::endl;
-	// std::cout << "body: " << _body << std::endl;
-	// std::cout << "method: " << _method << std::endl;
-	// std::cout << "target: " << _target << std::endl;
-	// std::cout << "protocol: " << _protocolVersion << std::endl;
-	// std::cout << "host: " << _host << std::endl;
-	// std::cout << "uagent: " << _uAgent << std::endl;
-	// std::cout << "accept: " << _accept << std::endl;
 }
 
 void	ws::Request::_checkPath() {
