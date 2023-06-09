@@ -33,7 +33,7 @@ temp = """
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Webserv</title>
-		<link rel="icon" type="image/x-icon" href="../assets/logo19.ico">
+		<link rel="icon" type="image/x-icon" href="/assets/logo19.ico">
 		<link rel="stylesheet" href="/assets/style.css">
 	</head>
 
@@ -47,7 +47,7 @@ temp = """
 				<li><a href="/cgi-tester.html">CGI Tester</a></li>
 				<li><a href="/upload-file.html">Upload File</a></li>
 				<li><a href="/delete-file.html">Delete File</a></li>
-				<li class="right-align"><a href="about.html">About</a></li>
+				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
 		</div>
 	</header>
@@ -70,7 +70,7 @@ end = """
 """
 
 if error:
-	temp2 = "<h2>Something went wrong woth the calculation...</h2>"
+	temp2 = "<h2>Something went wrong with the calculation...</h2>"
 	count = len(temp) + len(temp2) + len(end)
 else:
 	temp2 = "<h2>{} {} {} = {}</h2>".format(number1, operator, number2, result)
