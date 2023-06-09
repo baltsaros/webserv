@@ -11,6 +11,7 @@ ws::CgiHandler::CgiHandler(ws::Request req, int socketFd)
 {
 	this->_req = req;
 	this->_socketFd = socketFd;
+	this->_executable = this->_req.getTarget().erase(0, 1);
 	CgiHandler::initializeEnv();
 }
 
@@ -117,7 +118,7 @@ void	ws::CgiHandler::execute(void)
 	int pipe_out[2];
 
 	//Erase the first charactrer which is '/'. If not, execve will failed.
-	std::string newTarget = this->_req.getTarget().erase(0, 1);
+	//std::string newTarget = this->_req.getTarget().erase(0, 1);
 
 	if (pipe(pipe_in) < 0)
 		return ;
@@ -133,7 +134,7 @@ void	ws::CgiHandler::execute(void)
 
 		dup2(pipe_out[1], STDOUT_FILENO);
 		close(pipe_out[1]);
-		execve(newTarget.c_str(), NULL, env);
+		execve(this->_executable.c_str(), NULL, env);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
