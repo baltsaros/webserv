@@ -15,6 +15,9 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "uagent: " << _uAgent << std::endl;
 	// std::cout << "accept: " << _accept << std::endl;
 	// std::cout << "code: " << _returnStatus << std::endl;
+	// std::cout << "Headerfields:\n";
+	// printMapStrings(_headerFields);
+	// std::cout << std::endl;
 }
 
 ws::Request::Request(Request const &src) {
@@ -32,9 +35,7 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_method = rhs._method;
 		_target = rhs._target;
 		_protocolVersion = rhs._protocolVersion;
-		// _host = rhs._host;
-		// _uAgent = rhs._uAgent;
-		// _accept = rhs._accept;
+		_headerFields = rhs._headerFields;
 		_path = rhs._path;
 		_response = rhs._response;
 		_returnStatus = rhs._returnStatus;
@@ -85,17 +86,6 @@ void	ws::Request::readBuffer() {
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	_parseHeaderFields();
-	
-	//check for other parameters
-	// pos = _buffer.find("Host: ");
-	// if (pos != std::string::npos)
-	// 	_host = _getParam("Host: ", 6);
-	// pos = _buffer.find("User-Agent: ");
-	// if (pos != std::string::npos)
-	// 	_uAgent = _getParam("User-Agent: ", 12);
-	// pos = _buffer.find("Accept: ");
-	// if (pos != std::string::npos)
-	// 	_accept = _getParam("Accept: ", 8);
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
 	// std::cout << "method: " << _method << std::endl;
@@ -163,24 +153,31 @@ void	ws::Request::_parseHeaderFields() {
 
 	pos = _header.find("\r\n");
 	pos = pos + 2;
+	// content is a trim of _header without the first line
 	std::string	content = _header.substr(pos);
-	std::cout << "content:\n" << content;
+	// std::cout << "content:\n" << content;
+	// std::cout << "\n=============\n";
+	pos = 0;
+	// puts the lefthand side of ":" into the key of the map and the righthand side into the value of the map
 	while (pos != std::string::npos) {
-		pos1 = content.find(":", pos);
+		pos1 = content.find(COLON, pos);
 		if (pos1 == std::string::npos) {
 			_returnStatus = 400;
 			return ;
 		}
-		pair.first = content.substr(pos, pos1 - pos);
-		std::cout << "first: " << pair.first << std::endl;
-		pos2 = content.find(" ", pos1);
+		if (pos == 0)
+			pair.first = content.substr(pos, pos1);
+		else
+			pair.first = content.substr(pos + 1, pos1 - pos - 1);
+		// std::cout << "first: " << pair.first << std::endl;
+		pos2 = content.find(SPACE, pos1);
 		if (pos2 == std::string::npos) {
 			_returnStatus = 400;
 			return ;
 		}
-		pos = content.find("\n", pos2);
+		pos = content.find(NEWLINE, pos2);
 		pair.second = content.substr(pos2 + 1, pos - pos2 - 1);
-		std::cout << "second: " << pair.second << std::endl;
+		// std::cout << "second: " << pair.second << std::endl;
 		this->_headerFields.insert(pair);   
 	}
 }
@@ -192,9 +189,7 @@ std::string	ws::Request::getBody() const			{return _body;}
 std::string	ws::Request::getMethod() const			{return _method;}
 std::string	ws::Request::getTarget() const			{return _target;}
 std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
-// std::string	ws::Request::getHost() const			{return _host;}
-// std::string	ws::Request::getUAgent() const			{return _uAgent;}
-// std::string	ws::Request::getAccept() const			{return _accept;}
+std::map<std::string, std::string>	ws::Request::getHeaderFields() const	{return _headerFields;}
 std::string	ws::Request::getPath() const			{return _path;}
 std::string	ws::Request::getResponse() const		{return _response;}
 int			ws::Request::getReturnStatus() const	{return _returnStatus;}
