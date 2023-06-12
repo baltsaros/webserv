@@ -14,11 +14,11 @@
 		</div>
 		<div>
 			<ul class="navbar">
-				<li><a href="index.html">Home</a></li>
-				<li><a href="cgi-tester.html">CGI Tester</a></li>
-				<li><a href="upload-file.html">Upload File</a></li>
-				<li><a href="delete-file.html">Delete File</a></li>
-				<li class="right-align"><a href="about.html">About</a></li>
+				<li><a href="/index.html">Home</a></li>
+				<li><a href="/cgi-tester.html">CGI Tester</a></li>
+				<li><a href="/upload-file.html">Upload File</a></li>
+				<li><a href="/delete-file.html">Delete File</a></li>
+				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
 		</div>
 	</header>
@@ -26,17 +26,17 @@
 	<body class="body-style">
 		<br><br><br><br><br><br>
 		<div>
-			<form action="../../src/cgi-bin/calculator.py" method="post">
+			<form action="../../src/cgi-bin/calculator.py" method="post" name="cgi_form">
 				<label for="number1">Number one:</label><br>
-				<input type="number" id="num1" name="num1"><br>
+				<input type="number" id="num1" name="num1" required><br>
 				<label for="number2">Number two:</label><br>
-				<input type="number" id="num2" name="num2"><br>
+				<input type="number" id="num2" name="num2" required><br>
 				<label for="operator">Operator:</label><br>
-				<select id="operator" name="operator">
-					<option value="plus">+</option>
-					<option value="minus">-</option>
-					<option value="multiply">*</option>
-					<option value="divide">/</option>
+				<select id="operator" name="operator" required>
+					<option value="+">+</option>
+					<option value="-">-</option>
+					<option value="*">*</option>
+					<option value="/">/</option>
 				  </select>
 				<input type="submit" value="Submit">
 			</form>

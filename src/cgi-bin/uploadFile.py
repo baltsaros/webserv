@@ -1,32 +1,18 @@
 #!/usr/bin/python3
 
-import cgi, cgitb
+import cgi, os
+import cgitb
+
+cgitb.enable()
 
 form = cgi.FieldStorage()
 
-error = False
-number1 = int(form.getvalue('num1'))
-number2 = int(form.getvalue('num2'))
-operator = form.getvalue('operator')
+fileItem = form['filename']
+path = "upload_files/"
+isExist = os.path.exists(path)
 
-if operator == "+":
-	result = number1 + number2
-elif operator == "-":
-	result = number1 - number2
-elif operator == "/":
-	if (number2 == 0):
-		error = True
-	else:
-		result = number1 / number2
-elif operator == "*":
-	result = number1 * number2
-else:
-	error = True
-
-header = """
-	HTTP/1.1 200 OK
-	Content-type:text/html\r\n\r\n
-"""
+if not isExist:
+	os.makedirs(path)
 
 temp = """
 	<head>
@@ -69,18 +55,20 @@ end = """
 	</html>
 """
 
-if error:
-	temp2 = "<h2>Something went wrong with the calculation...</h2>"
-	count = len(temp) + len(temp2) + len(end)
+if  fileItem.filename:
+	fn = os.path.basename(fileItem.filename)
+	dest_path = os.path.join(path, fn)
+	open(path + fn, 'wb').write(fileItem.file.read())
+	message = 'The file "' + fn + '" was uploaded successfully'
+	count = len(temp) + len(message) + len(end)
 else:
-	temp2 = "<h2>{} {} {} = {}</h2>".format(number1, operator, number2, result)
-	count = len(temp) + len(temp2) + len(end)
+	message = 'No file was uploaed'
+	count = len(temp) + len(message) + len(end)
 
 print ("HTTP/1.1 200 OK")
-print ("Content-type:text/html")
+print ("Content-Type: text/html")
 print ("Content-Length: {}\r\n\r\n".format(count))
 print()
 print(temp, end=" ")
-print(temp2)
+print(message)
 print(end)
-
