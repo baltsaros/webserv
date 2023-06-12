@@ -60,7 +60,7 @@ void	ws::Request::readBuffer() {
 	size_t	crlf = 0;
 	size_t	pos;
 
-	// std::cout << "buffer: \n" << _buffer << std::endl;
+	std::cout << "buffer: \n" << _buffer << std::endl;
 	// check until empty line that separates body from header
 	crlf = _buffer.find("\r\n\r\n");
 	if (crlf == std::string::npos || !_buffer.size()) {

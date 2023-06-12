@@ -8,7 +8,7 @@ cgitb.enable()
 form = cgi.FieldStorage()
 
 fileItem = form['filename']
-path = "upload_files/"
+path = "website/upload_files/"
 isExist = os.path.exists(path)
 
 if not isExist:
