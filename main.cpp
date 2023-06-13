@@ -13,6 +13,10 @@ int	main(int argc, char **argv) {
 		config = new Configuration("config/default.conf");
 	else
 		config = new Configuration(argv[1]);
+	//std::cout << config->getConfigServer()[0]->getLocation()["/"]->getMethods()[0] << "\n";
+	//std::cout << config->getConfigServer()[0]->getLocation()["/"]->getMethods()[1] << "\n";
+	//std::cout << config->getConfigServer()[0]->getLocation()["/"]->getMethods()[2] << "\n";
+
 	// std::map<int, std::string>	errors = config.getConfigServer()[0]->getErrorPages();
 	// printMap(errors);
 	// std::map<std::string, ConfigLocation*>	locs = config.getConfigServer()[0]->getLocation();

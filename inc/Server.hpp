@@ -14,8 +14,8 @@
 # include "CgiHandler.hpp"
 
 # define BUFFER_SIZE 4096 // should be more than 4
-# define PATH_CGI_SCRIPT "/src/cgi-bin/calculator.py"
-# define PATH_UPLOAD_SCRIPT "/src/cgi-bin/uploadFile.py"
+# define PATH_CGI_SCRIPT "website/html/cgi-bin/calculator.py"
+# define PATH_UPLOAD_SCRIPT "website/html/cgi-bin/uploadFile.py"
 
 namespace	ws {
 class Server {

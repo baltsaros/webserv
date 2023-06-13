@@ -120,14 +120,19 @@ int		ws::Server::_responder(int sockfd) {
 	Response	response(_req);
 	std::string	toSend;
 
-	if (_checkCgi(this->_req))
+	if (this->_req.getMethod() == "DELETE")
+	{
+		ret = this->_deleteFile(this->_req, sockfd);
+	}
+	else if (_req.getReturnStatus() >= 0)
+	{
+		toSend = response.getResponse();
+		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
+	}
+	else if (_checkCgi(this->_req))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		ret = cgi.execute();
-	}
-	else if (this->_req.getMethod() == "DELETE")
-	{
-		ret = this->_deleteFile(this->_req, sockfd);
 	}
 	else {
 		toSend = response.getResponse();
@@ -255,11 +260,9 @@ void	ws::Server::test_connection(int to_test) {
 */
 bool	ws::Server::_checkCgi(Request & req)
 {
-	std::cout << req.getMethod() << "\n";
 	if (req.getMethod() != "POST") return (false);
-	std::cout << req.getTarget() << "\n";
-	if (req.getTarget() == PATH_CGI_SCRIPT) return (true);
-	if (req.getTarget() == PATH_UPLOAD_SCRIPT) return (true);
+	if (req.getPath() == PATH_CGI_SCRIPT) return (true);
+	if (req.getPath() == PATH_UPLOAD_SCRIPT) return (true);
 	return (false);
 }
 
@@ -274,8 +277,7 @@ bool	ws::Server::_checkCgi(Request & req)
 int		ws::Server::_deleteFile(Request & req, int socketFd)
 {
 	std::string	response = 	"HTTP/1.1 204 No Content\n\n";
-
-	remove((this->_req.getTarget().erase(0, 1)).c_str());
+	remove((this->_req.getPath()).c_str());
 	return send(socketFd, response.c_str(), response.size(), 0);
 }
 

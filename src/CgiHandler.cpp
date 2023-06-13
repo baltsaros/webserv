@@ -11,7 +11,7 @@ ws::CgiHandler::CgiHandler(ws::Request req, int socketFd)
 {
 	this->_req = req;
 	this->_socketFd = socketFd;
-	this->_executable = this->_req.getTarget().erase(0, 1);
+	this->_executable = this->_req.getPath();
 	CgiHandler::initializeEnv();
 }
 
