@@ -35,6 +35,7 @@ class Server {
 		int								_responder(int sockfd);
 		bool							_checkSocket(int sockfd);
 		bool							_checkCgi(Request & req);
+		int								_deleteFile(Request & req, int socketFds);
 
 	public:
 		Server();

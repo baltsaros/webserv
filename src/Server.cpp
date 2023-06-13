@@ -125,13 +125,17 @@ int		ws::Server::_responder(int sockfd) {
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		ret = cgi.execute();
 	}
+	else if (this->_req.getMethod() == "DELETE")
+	{
+		ret = this->_deleteFile(this->_req, sockfd);
+	}
 	else {
 		toSend = response.getResponse();
 		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
-		if (ret == -1) {
-			std::cerr << "Send() error" << std::endl;
-			return -1;
-		}
+	}
+	if (ret == -1) {
+		std::cerr << "Send() error" << std::endl;
+		return -1;
 	}
 	return ret;
 }
@@ -260,6 +264,22 @@ bool	ws::Server::_checkCgi(Request & req)
 	if (req.getTarget() == PATH_CGI_SCRIPT) return (true);
 	if (req.getTarget() == PATH_UPLOAD_SCRIPT) return (true);
 	return (false);
+}
+
+/*
+** Delete a file and send back a response with no content.
+**  the user doesn't need to know if the file was deleted or not
+**  so we don't need to check the return of remove function.
+** @param : Request &req : the request sent to the server.
+			int socketFd : the socket where we send the response.
+** @return : int : The return of send to know if there was a error or not.
+*/
+int		ws::Server::_deleteFile(Request & req, int socketFd)
+{
+	std::string	response = 	"HTTP/1.1 204 No Content\n\n";
+
+	remove((this->_req.getTarget().erase(0, 1)).c_str());
+	return send(socketFd, response.c_str(), response.size(), 0);
 }
 
 // Getters
