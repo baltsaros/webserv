@@ -4,6 +4,7 @@ ws::Request::Request() {_returnStatus = -1;}
 ws::Request::Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation *> locations)
 		: _buffer(buffer), _config(config) {
 	_returnStatus = -1;
+	_autoIndexFlag = 0;
 	_locations = locations;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
@@ -11,10 +12,6 @@ ws::Request::Request(const std::string &buffer, const Configuration &config, std
 	// std::cout << "method: " << _method << std::endl;
 	// std::cout << "target: " << _target << std::endl;
 	// std::cout << "protocol: " << _protocolVersion << std::endl;
-	// std::cout << "host: " << _host << std::endl;
-	// std::cout << "uagent: " << _uAgent << std::endl;
-	// std::cout << "accept: " << _accept << std::endl;
-	// std::cout << "code: " << _returnStatus << std::endl;
 	// std::cout << "Headerfields:\n";
 	// printMapStrings(_headerFields);
 	// std::cout << std::endl;
@@ -40,6 +37,7 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_response = rhs._response;
 		_returnStatus = rhs._returnStatus;
 		_locations = rhs._locations;
+		_autoIndexFlag = rhs._autoIndexFlag;
 	}
 	return (*this);
 }
@@ -86,14 +84,6 @@ void	ws::Request::readBuffer() {
 	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	_parseHeaderFields();
-	// std::cout << "header: " << _header << std::endl;
-	// std::cout << "body: " << _body << std::endl;
-	// std::cout << "method: " << _method << std::endl;
-	// std::cout << "target: " << _target << std::endl;
-	// std::cout << "protocol: " << _protocolVersion << std::endl;
-	// std::cout << "host: " << _host << std::endl;
-	// std::cout << "uagent: " << _uAgent << std::endl;
-	// std::cout << "accept: " << _accept << std::endl;
 }
 
 void	ws::Request::_checkPath() {
@@ -111,8 +101,12 @@ void	ws::Request::_checkPath() {
 		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
 	else
 		_path = _locations["/"]->getRoot() + _target;
+	// 
 	// simple check of whether we need to append ".html" to the filepath or not
-	if (!cssFlag && !ws::checkExtension(_path, ".html"))
+	if (isDirectory(_path)) {
+		_autoIndexFlag = 1;
+	}
+	else if (!cssFlag && !ws::checkExtension(_path, ".html"))
 		_path += ".html";
 	// std::cout << "target: " << _target << std::endl;
 	// std::cout << "path: " << _path << std::endl;
@@ -178,9 +172,12 @@ void	ws::Request::_parseHeaderFields() {
 		pos = content.find(NEWLINE, pos2);
 		pair.second = content.substr(pos2 + 1, pos - pos2 - 1);
 		// std::cout << "second: " << pair.second << std::endl;
-		this->_headerFields.insert(pair);   
+		this->_headerFields.insert(pair);
 	}
 }
+
+// Setters
+void	ws::Request::setReturnStatus(int code) {_returnStatus = code;}
 
 // Getters
 std::string	ws::Request::getBuffer() const			{return _buffer;}
@@ -193,3 +190,4 @@ std::map<std::string, std::string>	ws::Request::getHeaderFields() const	{return 
 std::string	ws::Request::getPath() const			{return _path;}
 std::string	ws::Request::getResponse() const		{return _response;}
 int			ws::Request::getReturnStatus() const	{return _returnStatus;}
+int			ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
