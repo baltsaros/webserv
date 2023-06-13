@@ -4,7 +4,6 @@ ws::Request::Request() {_returnStatus = -1;}
 ws::Request::Request(const std::string &buffer, ConfigServer *config)
 		: _buffer(buffer), _config(config) {
 	_returnStatus = -1;
-	std::cout << "autoindex: " << _config->getAutoIndex() << std::endl;
 	_locations = _config->getLocation();
 	_autoIndexFlag = false;
 	readBuffer();
@@ -88,34 +87,59 @@ void	ws::Request::readBuffer() {
 }
 
 void	ws::Request::_checkPath() {
-	bool		cssFlag = false;
-	bool		icoFlag = false;
+	std::map<std::string, ConfigLocation *>::iterator	it = _locations.begin();
+	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
+	bool	aiFlag = false;
+	bool	findLocation = false;
 
-	cssFlag = ws::checkExtension(_target, ".css");
-	icoFlag = ws::checkExtension(_target, ".ico");
-	// creating a filepath for recv(); if _target has .css/.ico extension
-	// it looks for /assets location; if target is /, it returns a home page
-	// in all other cases it appends _target to the root path
-	if (cssFlag || icoFlag)
-		_path = _locations["/assets"]->getRoot() + _target;
-	else if (!_target.compare("/"))
-		_path = _locations["/"]->getRoot() + "/" + _locations["/"]->getIndex();
-	else
-		_path = _locations["/"]->getRoot() + _target;
-	// 
-	// simple check of whether we need to append ".html" to the filepath or not
-	if (_autoIndexFlag && !isDirectory(_path)) {
-		std::cout << "autoindex if off\n";
+	do {
 		_autoIndexFlag = false;
+		_returnStatus = -1;
+		// creating a filepath for recv(); if _target has .css/.ico extension
+		// it looks for /assets location; if target is /, it returns a home page
+		// in all other cases it appends _target to the root path
+		aiFlag = it->second->getAutoIndex();
+		if (!_target.compare(it->first))
+			_path = it->second->getRoot() + "/" + it->second->getIndex();
+		else
+			_path = it->second->getRoot() + _target;
+		// check if directory exists or not; otherwise append ".html"
+		if (aiFlag && isDirectory(_path))
+			_autoIndexFlag = true;
+		else if (ws::checkNoExtension(_path))
+			_path += ".html";
+		// std::cout << "name: " << it->first << std::endl;
+		// std::cout << "target: " << _target << std::endl;
+		// std::cout << "path: " << _path << std::endl;
+		// std::cout << "exist: " << fileExists(_path) << std::endl;
+		// if file at _path does not exist, return error 404
+		if (ws::fileExists(_path)) {
+			findLocation = true;
+			if (!_checkMethod(it->second->getMethods())) {
+				_returnStatus = 405;
+				break ;
+			}
+		}
+		++it;
+		if (it == itEnd && !findLocation) {
+			findLocation = true;
+			_returnStatus = 404;
+		}
+	} while (findLocation != true);
+}
+
+bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
+	std::vector<std::string>::iterator	it = methods.begin();
+	std::vector<std::string>::iterator	itEnd = methods.end();
+
+	// allow GET methods if in a locations allowed methods are not specified
+	if (methods.empty() && !_method.compare("GET"))
+		return true;
+	for (; it != itEnd; ++it) {
+		if (!_method.compare(*it))
+			return true;
 	}
-	else if (!cssFlag && !ws::checkExtension(_path, ".html"))
-		_path += ".html";
-	// std::cout << "target: " << _target << std::endl;
-	// std::cout << "path: " << _path << std::endl;
-	// std::cout << "exist: " << fileExists(_path) << std::endl;
-	// if file at _path does not exist, return error 404
-	if (!ws::fileExists(_path))
-		_returnStatus = 404;
+	return false;
 }
 
 // need to check for errors

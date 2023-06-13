@@ -10,6 +10,7 @@
 namespace ws {
 	std::string	readFile(const std::string &file);
 	bool		checkExtension(const std::string &file, const std::string &ext);
+	bool		checkNoExtension(const std::string &file);
 	bool		fileExists(const std::string &file);
 	bool		isDirectory(const std::string &path);
 }
