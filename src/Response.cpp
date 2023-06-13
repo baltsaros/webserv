@@ -50,7 +50,7 @@ void	ws::Response::createResponse() {
 // check for an error code and create an according response
 void	ws::Response::checkRequest() {
 	int	returnStatus = _req.getReturnStatus();
-	std::map<int, std::string>	errorPath = _config.getConfigServer()[0]->getErrorPages();
+	std::map<int, std::string>	errorPath = _req.getConfig()->getErrorPages();
 	_msg = ws::readFile(errorPath[returnStatus]);
 	switch (returnStatus) {
 		case 400:

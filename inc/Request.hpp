@@ -15,7 +15,7 @@ namespace ws {
 class Request {
 	private:
 		std::string								_buffer;
-		Configuration							_config;
+		ConfigServer							*_config;
 		std::string								_header;
 		std::string								_body;
 		std::string								_method;
@@ -35,7 +35,7 @@ class Request {
 
 	public:
 		Request();
-		Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation*> locations);
+		Request(const std::string &buffer, ConfigServer *config);
 		Request(const Request &src);
 		~Request();
 
@@ -53,6 +53,7 @@ class Request {
 		std::string							getTarget() const;
 		std::string							getProtocol() const;
 		std::map<std::string, std::string>	getHeaderFields() const;
+		ConfigServer*						getConfig() const;
 		std::string							getPath() const;
 		std::string							getResponse() const;
 		int									getReturnStatus() const;
