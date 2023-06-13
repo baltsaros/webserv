@@ -123,8 +123,7 @@ int		ws::Server::_responder(int sockfd) {
 	if (_checkCgi(this->_req))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
-		cgi.execute();
-		ret = 1;
+		ret = cgi.execute();
 	}
 	else {
 		toSend = response.getResponse();

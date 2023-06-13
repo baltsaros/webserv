@@ -7,6 +7,7 @@
 # include <iostream>
 # include <map>
 # include <sys/socket.h>
+# include <sys/wait.h>
 
 # define CONTENT_TYPE "CONTENT_TYPE"
 # define CONTENT_LENGTH "CONTENT_LENGTH"
@@ -50,7 +51,7 @@ class CgiHandler
 		std::map<std::string, std::string>	getEnvVariables(void) const;
 		int									getSocketFd(void) const;
 
-		void	execute(void);
+		int	execute(void);
 };
 }
 #endif

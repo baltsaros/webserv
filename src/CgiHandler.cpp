@@ -103,7 +103,7 @@ void	ws::CgiHandler::initializeEnv(void)
 ** The parent function is used to send the data to the child process and get 
 **	the response back to write it through the socket fd.
 */
-void	ws::CgiHandler::execute(void)
+int	ws::CgiHandler::execute(void)
 {
 	char *env[] = {&this->_envVariables[CONTENT_TYPE][0],
 					&this->_envVariables[CONTENT_LENGTH][0],
@@ -116,14 +116,15 @@ void	ws::CgiHandler::execute(void)
 					NULL};
 	int pipe_in[2];
 	int pipe_out[2];
+	int	status = 0;
 
 	//Erase the first charactrer which is '/'. If not, execve will failed.
 	//std::string newTarget = this->_req.getTarget().erase(0, 1);
 
 	if (pipe(pipe_in) < 0)
-		return ;
+		return -1;
 	if (pipe(pipe_out) < 0)
-		return ;
+		return -1;
 	int pid = fork();
 	if (pid == 0) //child
 	{
@@ -144,7 +145,9 @@ void	ws::CgiHandler::execute(void)
 		close(pipe_in[0]);
 		close(pipe_out[1]);
 		std::string body = this->_req.getBody();
-		write(pipe_in[1], body.c_str(), body.size());
+		status = write(pipe_in[1], body.c_str(), body.size());
+		if (status < 0)
+			return -1;
 		close(pipe_in[1]);
 
 		char buf[BUFFER_LENGTH];
@@ -152,10 +155,13 @@ void	ws::CgiHandler::execute(void)
 
 		while((ret = read(pipe_out[0], buf, BUFFER_LENGTH)))
 		{
+			if (ret < 0)
+				return -1;
 			toRet = buf;
-			send(this->_socketFd, toRet.c_str(), toRet.size(), 0);
+			status = send(this->_socketFd, toRet.c_str(), toRet.size(), 0);
 		}
 		close(pipe_out[0]);
 		waitpid(pid, NULL, 0);
 	}
+	return status;
 }
