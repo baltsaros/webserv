@@ -133,10 +133,6 @@ int		ws::Server::_responder(int sockfd) {
 		toSend = response.getResponse();
 		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
 	}
-	if (ret == -1) {
-		std::cerr << "Send() error" << std::endl;
-		return -1;
-	}
 	return ret;
 }
 
@@ -214,6 +210,7 @@ void	ws::Server::launcher() {
 						// send response back to the client
 						ret = _responder(i);
 						if (ret == -1) {
+							std::cerr << "Send() error" << std::endl;
 							close_conn = true;
 							break ;
 						}
