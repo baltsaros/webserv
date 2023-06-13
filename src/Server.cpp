@@ -117,7 +117,7 @@ int		ws::Server::_handler(int sockfd) {
 // Send a response back
 int		ws::Server::_responder(int sockfd) {
 	int			ret;
-	Response	response(_req, _config);
+	Response	response(_req);
 	std::string	toSend;
 
 	if (_checkCgi(this->_req))

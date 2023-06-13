@@ -2,8 +2,8 @@
 
 ws::Response::Response() {}
 
-ws::Response::Response(const Request &req, const Configuration &config) :
-		_req(req), _config(config) {createResponse();}
+ws::Response::Response(const Request &req) :
+		_req(req) {createResponse();}
 
 ws::Response::Response(const Response &src) {*this = src;}
 
@@ -14,7 +14,6 @@ ws::Response&	ws::Response::operator=(const Response &rhs) {
 		_msg = rhs._msg;
 		_response = rhs._response;
 		_ret = rhs._ret;
-		_config = rhs._config;
 		_req = rhs._req;
 	}
 	return *this;
