@@ -1,11 +1,11 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_returnStatus = -1;}
-ws::Request::Request(const std::string &buffer, const Configuration &config, std::map<std::string, ConfigLocation *> locations)
+ws::Request::Request(const std::string &buffer, ConfigServer *config)
 		: _buffer(buffer), _config(config) {
 	_returnStatus = -1;
 	_autoIndexFlag = 0;
-	_locations = locations;
+	_locations = _config->getLocation();
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
@@ -180,14 +180,15 @@ void	ws::Request::_parseHeaderFields() {
 void	ws::Request::setReturnStatus(int code) {_returnStatus = code;}
 
 // Getters
-std::string	ws::Request::getBuffer() const			{return _buffer;}
-std::string	ws::Request::getHeader() const			{return _header;}
-std::string	ws::Request::getBody() const			{return _body;}
-std::string	ws::Request::getMethod() const			{return _method;}
-std::string	ws::Request::getTarget() const			{return _target;}
-std::string	ws::Request::getProtocol() const		{return _protocolVersion;}
+std::string		ws::Request::getBuffer() const			{return _buffer;}
+std::string		ws::Request::getHeader() const			{return _header;}
+std::string		ws::Request::getBody() const			{return _body;}
+std::string		ws::Request::getMethod() const			{return _method;}
+std::string		ws::Request::getTarget() const			{return _target;}
+std::string		ws::Request::getProtocol() const		{return _protocolVersion;}
 std::map<std::string, std::string>	ws::Request::getHeaderFields() const	{return _headerFields;}
-std::string	ws::Request::getPath() const			{return _path;}
-std::string	ws::Request::getResponse() const		{return _response;}
-int			ws::Request::getReturnStatus() const	{return _returnStatus;}
-int			ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
+ConfigServer*	ws::Request::getConfig() const			{return _config;}
+std::string		ws::Request::getPath() const			{return _path;}
+std::string		ws::Request::getResponse() const		{return _response;}
+int				ws::Request::getReturnStatus() const	{return _returnStatus;}
+int				ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
