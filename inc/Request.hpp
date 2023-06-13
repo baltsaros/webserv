@@ -25,7 +25,7 @@ class Request {
 		std::string								_path;
 		std::string								_response;
 		int										_returnStatus;
-		int										_autoIndexFlag;
+		bool									_autoIndexFlag;
 		std::map<std::string, ConfigLocation *>	_locations;
 		void									_checkPos(size_t pos);
 		std::string								_getParam(std::string toGet, size_t offset);
@@ -57,6 +57,6 @@ class Request {
 		std::string							getPath() const;
 		std::string							getResponse() const;
 		int									getReturnStatus() const;
-		int									getAutoIndexFlag() const;
+		bool								getAutoIndexFlag() const;
 };
 }

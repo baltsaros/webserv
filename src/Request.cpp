@@ -4,8 +4,9 @@ ws::Request::Request() {_returnStatus = -1;}
 ws::Request::Request(const std::string &buffer, ConfigServer *config)
 		: _buffer(buffer), _config(config) {
 	_returnStatus = -1;
-	_autoIndexFlag = 0;
+	std::cout << "autoindex: " << _config->getAutoIndex() << std::endl;
 	_locations = _config->getLocation();
+	_autoIndexFlag = false;
 	readBuffer();
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
@@ -103,8 +104,9 @@ void	ws::Request::_checkPath() {
 		_path = _locations["/"]->getRoot() + _target;
 	// 
 	// simple check of whether we need to append ".html" to the filepath or not
-	if (isDirectory(_path)) {
-		_autoIndexFlag = 1;
+	if (_autoIndexFlag && !isDirectory(_path)) {
+		std::cout << "autoindex if off\n";
+		_autoIndexFlag = false;
 	}
 	else if (!cssFlag && !ws::checkExtension(_path, ".html"))
 		_path += ".html";
@@ -191,4 +193,4 @@ ConfigServer*	ws::Request::getConfig() const			{return _config;}
 std::string		ws::Request::getPath() const			{return _path;}
 std::string		ws::Request::getResponse() const		{return _response;}
 int				ws::Request::getReturnStatus() const	{return _returnStatus;}
-int				ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
+bool			ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
