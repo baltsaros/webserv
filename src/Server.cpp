@@ -120,7 +120,7 @@ int		ws::Server::_responder(int sockfd) {
 	Response	response(_req, _config);
 	std::string	toSend;
 
-	if (this->_req.getMethod() == "POST")
+	if (_checkCgi(this->_req))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		cgi.execute();
@@ -246,6 +246,21 @@ void	ws::Server::test_connection(int to_test) {
 		// std::cout << "Webserver error: " << strerror(to_test) << std::endl;
 		// exit(EXIT_FAILURE);
 	// }
+}
+
+/*
+** Check if the Cgi can handle the request with script we've written
+** @param Request req : The request we've received
+** @return boolean : True if the cgi can handle the script, false otherwise
+*/
+bool	ws::Server::_checkCgi(Request & req)
+{
+	std::cout << req.getMethod() << "\n";
+	if (req.getMethod() != "POST") return (false);
+	std::cout << req.getTarget() << "\n";
+	if (req.getTarget() == PATH_CGI_SCRIPT) return (true);
+	if (req.getTarget() == PATH_UPLOAD_SCRIPT) return (true);
+	return (false);
 }
 
 // Getters

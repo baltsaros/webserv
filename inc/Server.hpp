@@ -14,6 +14,8 @@
 # include "CgiHandler.hpp"
 
 # define BUFFER_SIZE 4096 // should be more than 4
+# define PATH_CGI_SCRIPT "/src/cgi-bin/calculator.py"
+# define PATH_UPLOAD_SCRIPT "/src/cgi-bin/uploadFile.py"
 
 namespace	ws {
 class Server {
@@ -32,6 +34,7 @@ class Server {
 		int								_handler(int sockfd);
 		int								_responder(int sockfd);
 		bool							_checkSocket(int sockfd);
+		bool							_checkCgi(Request & req);
 
 	public:
 		Server();
