@@ -20,3 +20,11 @@ bool	ws::checkExtension(const std::string &file, const std::string &ext) {
 bool	ws::fileExists(const std::string &file) {
 	return access(file.c_str(), F_OK) == 0;
 }
+
+bool	ws::isDirectory(const std::string &path) {
+	struct stat	params;
+
+	if (stat(path.c_str(), &params) == 0)
+		return S_ISDIR(params.st_mode);
+	return false;
+}

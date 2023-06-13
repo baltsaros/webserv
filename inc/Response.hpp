@@ -20,6 +20,7 @@ class Response {
 		Response&	operator=(const Response &rhs);
 		void		createResponse();
 		void		checkRequest();
+		std::string	createAutoIndex();
 
 		std::string	getMsg() const;
 		std::string	getResponse() const;
