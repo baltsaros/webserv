@@ -2,6 +2,7 @@
 
 # include <string>
 # include <iostream>
+# include <dirent.h> // to open directories
 # include "Configuration.hpp"
 # include "ServerUtils.hpp"
 # include "ConfigUtils.hpp"
@@ -24,6 +25,7 @@ class Request {
 		std::string								_path;
 		std::string								_response;
 		int										_returnStatus;
+		int										_autoIndexFlag;
 		std::map<std::string, ConfigLocation *>	_locations;
 		void									_checkPos(size_t pos);
 		std::string								_getParam(std::string toGet, size_t offset);
@@ -40,6 +42,9 @@ class Request {
 		Request&	operator=(const Request &rhs);
 		void		readBuffer();
 
+		// setters
+		void								setReturnStatus(int code);
+
 		// getters
 		std::string							getBuffer() const;
 		std::string							getHeader() const;
@@ -51,5 +56,6 @@ class Request {
 		std::string							getPath() const;
 		std::string							getResponse() const;
 		int									getReturnStatus() const;
+		int									getAutoIndexFlag() const;
 };
 }
