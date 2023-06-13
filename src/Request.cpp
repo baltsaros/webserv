@@ -108,8 +108,8 @@ void	ws::Request::_checkPath() {
 	}
 	else if (!cssFlag && !ws::checkExtension(_path, ".html"))
 		_path += ".html";
-	std::cout << "target: " << _target << std::endl;
-	std::cout << "path: " << _path << std::endl;
+	// std::cout << "target: " << _target << std::endl;
+	// std::cout << "path: " << _path << std::endl;
 	// std::cout << "exist: " << fileExists(_path) << std::endl;
 	// if file at _path does not exist, return error 404
 	if (!ws::fileExists(_path))

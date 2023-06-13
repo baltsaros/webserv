@@ -80,11 +80,13 @@ void	ws::Response::checkRequest() {
 
 std::string	ws::Response::createAutoIndex() {
 	std::string			path = _req.getPath();
+	std::string			target = _req.getTarget();
 	std::stringstream	buf;
 	DIR					*dir;
 	struct dirent		*entry;
 
-	std::cout << "path in response: " << path << std::endl;
+	// std::cout << "target in response: " << target << std::endl;
+	// std::cout << "path in response: " << path << std::endl;
 	buf << "<!DOCTYPE html>\n";
 	buf << "<html lang=\"en\">\n";
 	buf << "<head><title>AutoIndex for " << path << "</title></head>\n";
@@ -99,7 +101,7 @@ std::string	ws::Response::createAutoIndex() {
 	else {
 		entry = readdir(dir);
 		while (entry) {
-			buf << "<li><a href=\"" << entry->d_name << "\">";
+			buf << "<li><a href=\"" << target + "/" + entry->d_name << "\">";
 			buf << entry->d_name << "</a></li>\n";
 			entry = readdir(dir);
 		}
