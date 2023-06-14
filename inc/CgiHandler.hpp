@@ -20,7 +20,7 @@
 # define USER_AGENT_FIELD "User-Agent"
 # define CONTENT_TYPE_FIELD "Content-Type"
 
-# define BUFFER_LENGTH 1024
+# define BUFFER_LENGTH 4096
 
 class Request;
 

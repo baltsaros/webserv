@@ -71,6 +71,7 @@ void	ws::Request::readBuffer() {
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
+	std::cout << "======HEADERS======\n" << _header << "\n";
 	// std::cout << "Header: " << _header << "\n";
 	// std::cout << "============" << "\n";
 	// check that there are no empty spaces before method
@@ -80,10 +81,16 @@ void	ws::Request::readBuffer() {
 		return ;
 	}
 	_body = _buffer.substr(crlf + 4);
-	// std::cout << "body: " << _body << "|\n";
-	// get parameters from the starting line: method, taget and protocol version
+	if (this->_body.size() > this->_config->getClientMaxBodySize())
+	{
+		std::cerr << "Body size is higher than client max body size field\n";
+		this->_returnStatus = 413;
+		return ;
+	}
 	_parseStartingLine();
 	_parseHeaderFields();
+	// std::cout << "body: " << _body << "|\n";
+	// get parameters from the starting line: method, taget and protocol version
 }
 
 void	ws::Request::_checkPath() {

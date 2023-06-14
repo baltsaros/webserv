@@ -261,6 +261,7 @@ void	ws::Server::test_connection(int to_test) {
 bool	ws::Server::_checkCgi(Request & req)
 {
 	if (req.getMethod() != "POST") return (false);
+	//std::cout << "TARGET ====== " << req.getTarget() << "\n";
 	if (req.getPath() == PATH_CGI_SCRIPT) return (true);
 	if (req.getPath() == PATH_UPLOAD_SCRIPT) return (true);
 	return (false);
