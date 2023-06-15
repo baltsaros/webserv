@@ -100,6 +100,10 @@ std::string	ws::Response::createAutoIndex() {
 	else {
 		entry = readdir(dir);
 		while (entry) {
+			if (!strcmp(".", entry->d_name) || !strcmp("..", entry->d_name)) {
+				entry = readdir(dir);
+				continue ;
+			}
 			buf << "<li><a href=\"" << target + "/" + entry->d_name << "\">";
 			buf << entry->d_name << "</a></li>\n";
 			entry = readdir(dir);
