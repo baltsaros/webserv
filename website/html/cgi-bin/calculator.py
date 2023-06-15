@@ -1,25 +1,30 @@
 #!/usr/bin/python3
 
-import cgi, cgitb
+import cgi, cgitb, os, sys
 
 form = cgi.FieldStorage()
 
+#print(os.environ["QUERY_STRING"], file=sys.stderr)
 error = False
 number1 = int(form.getvalue('num1'))
 number2 = int(form.getvalue('num2'))
 operator = form.getvalue('operator')
+sign = "+"
 
-if operator == "+":
+if operator == "plus":
 	result = number1 + number2
-elif operator == "-":
+elif operator == "minus":
 	result = number1 - number2
-elif operator == "/":
+	sign = "-"
+elif operator == "divide":
 	if (number2 == 0):
 		error = True
 	else:
 		result = number1 / number2
-elif operator == "*":
+	sign = "/"
+elif operator == "multiply":
 	result = number1 * number2
+	sign = "*"
 else:
 	error = True
 
@@ -45,7 +50,8 @@ temp = """
 		<div>
 			<ul class="navbar">
 				<li><a href="/index.html">Home</a></li>
-				<li><a href="/cgi-tester.html">CGI Tester</a></li>
+				<li><a href="/cgi-tester.html">CGI Tester POST</a></li>
+				<li><a href="/cgi-tester-get.html">CGI Tester GET</a></li>
 				<li><a href="/upload-file.html">Upload File</a></li>
 				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
@@ -73,7 +79,7 @@ if error:
 	temp2 = "<h2>Something went wrong with the calculation...</h2>"
 	count = len(temp) + len(temp2) + len(end)
 else:
-	temp2 = "<h2>{} {} {} = {}</h2>".format(number1, operator, number2, result)
+	temp2 = "<h2>{} {} {} = {}</h2>".format(number1, sign, number2, result)
 	count = len(temp) + len(temp2) + len(end)
 
 print ("HTTP/1.1 200 OK")

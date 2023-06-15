@@ -31,7 +31,8 @@ temp = """
 		<div>
 			<ul class="navbar">
 				<li><a href="/index.html">Home</a></li>
-				<li><a href="/cgi-tester.html">CGI Tester</a></li>
+				<li><a href="/cgi-tester.html">CGI Tester POST</a></li>
+				<li><a href="/cgi-tester-get.html">CGI Tester GET</a></li>
 				<li><a href="/upload-file.html">Upload File</a></li>
 				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
