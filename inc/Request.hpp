@@ -34,6 +34,7 @@ class Request {
 		bool									_checkMethod(std::vector<std::string> methods);
 		void									_parseStartingLine();
 		void									_parseHeaderFields();
+		void									_parseGetTarget();
 
 	public:
 		Request();

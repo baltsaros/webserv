@@ -164,14 +164,7 @@ void	ws::Request::_parseStartingLine() {
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
 	_queryString = _target;
-	//==================
-	int pos2 = _target.find("?");
-	if (pos2 != std::string::npos)
-	{
-		_target.erase(pos2, std::string::npos);
-	}
-	_queryString.erase(0, pos2 + 1);
-	//===================
+	_parseGetTarget();
 	_checkPath();
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
@@ -214,6 +207,16 @@ void	ws::Request::_parseHeaderFields() {
 		// std::cout << "second: " << pair.second << std::endl;
 		this->_headerFields.insert(pair);
 	}
+}
+
+void	ws::Request::_parseGetTarget(void)
+{
+	int pos2 = _target.find("?");
+	if (pos2 != std::string::npos)
+	{
+		_target.erase(pos2, std::string::npos);
+	}
+	_queryString.erase(0, pos2 + 1);
 }
 
 // Setters
