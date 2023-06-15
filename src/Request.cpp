@@ -38,6 +38,7 @@ ws::Request&	ws::Request::operator=(Request const &rhs) {
 		_returnStatus = rhs._returnStatus;
 		_locations = rhs._locations;
 		_autoIndexFlag = rhs._autoIndexFlag;
+		_queryString = rhs._queryString;
 	}
 	return (*this);
 }
@@ -71,19 +72,23 @@ void	ws::Request::readBuffer() {
 		return ;
 	}
 	_header = _buffer.substr(0, crlf);
-	// std::cout << "Header: " << _header << "\n";
-	// std::cout << "============" << "\n";
 	// check that there are no empty spaces before method
 	if (_header[0] != 'G' && _header[0] != 'P' && _header[0] != 'D') {
 		std::cerr << "Invalid method" << std::endl;
 		_returnStatus = 405;
 		return ;
 	}
-	_body = _buffer.substr(crlf + 4);
-	// std::cout << "body: " << _body << "|\n";
-	// get parameters from the starting line: method, taget and protocol version
 	_parseStartingLine();
 	_parseHeaderFields();
+	_body = _buffer.substr(crlf + 4);
+	if (this->_body.size() > this->_config->getClientMaxBodySize())
+	{
+		std::cerr << "Body size is higher than client max body size field\n";
+		this->_returnStatus = 413;
+		return ;
+	}
+	// std::cout << "body: " << _body << "|\n";
+	// get parameters from the starting line: method, taget and protocol version
 }
 
 void	ws::Request::_checkPath() {
@@ -167,6 +172,8 @@ void	ws::Request::_parseStartingLine() {
 	start = pos + 1;
 	pos = _header.find(" ", start);
 	_target = _header.substr(start, pos - start);
+	_queryString = _target;
+	_parseGetTarget();
 	_checkPath();
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
@@ -211,6 +218,16 @@ void	ws::Request::_parseHeaderFields() {
 	}
 }
 
+void	ws::Request::_parseGetTarget(void)
+{
+	int pos2 = _target.find("?");
+	if (pos2 != std::string::npos)
+	{
+		_target.erase(pos2, std::string::npos);
+	}
+	_queryString.erase(0, pos2 + 1);
+}
+
 // Setters
 void	ws::Request::setReturnStatus(int code) {_returnStatus = code;}
 
@@ -227,3 +244,5 @@ std::string		ws::Request::getPath() const			{return _path;}
 std::string		ws::Request::getResponse() const		{return _response;}
 int				ws::Request::getReturnStatus() const	{return _returnStatus;}
 bool			ws::Request::getAutoIndexFlag() const	{return _autoIndexFlag;}
+std::string		ws::Request::getQueryString() const		{return _queryString;}
+void			ws::Request::setPath(std::string & path) {this->_path = path;}

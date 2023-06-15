@@ -15,8 +15,9 @@ if not isExist:
 	os.makedirs(path)
 
 temp = """
+	<!DOCTYPE html>
 	<head>
-		<meta charset="utf-8">
+		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Webserv</title>
 		<link rel="icon" type="image/x-icon" href="/assets/logo19.ico">
@@ -30,7 +31,8 @@ temp = """
 		<div>
 			<ul class="navbar">
 				<li><a href="/index.html">Home</a></li>
-				<li><a href="/cgi-tester.html">CGI Tester</a></li>
+				<li><a href="/cgi-tester.html">CGI Tester POST</a></li>
+				<li><a href="/cgi-tester-get.html">CGI Tester GET</a></li>
 				<li><a href="/upload-file.html">Upload File</a></li>
 				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
