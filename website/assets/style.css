@@ -1,8 +1,9 @@
 .logo
-{
-	display: block;
-	font-size: 200px;
-}
+			{
+				display: block;
+				font-size: 200px;
+				text-align: center;
+			}
 
 .navbar
 {
@@ -83,4 +84,20 @@ select
 {
 	background-color: #404040;
 	color: #99FFCC;
+}
+
+.error
+{
+	font-family:'Courier New', Courier, monospace;
+	text-align: center;
+}
+
+#code
+{
+	font-size: 150px;	
+}
+#notFound
+{
+	font-size: 70px;
+
 }

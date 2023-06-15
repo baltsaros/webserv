@@ -14,20 +14,20 @@
 		</div>
 		<div>
 			<ul class="navbar">
-				<li><a href="index.html">Home</a></li>
-				<li><a href="cgi-tester.html">CGI Tester</a></li>
-				<li><a href="upload-file.html">Upload File</a></li>
-				<li><a href="delete-file.html">Delete File</a></li>
-				<li class="right-align"><a href="about.html">About</a></li>
+				<li><a href="/index.html">Home</a></li>
+				<li><a href="/cgi-tester.html">CGI Tester</a></li>
+				<li><a href="/upload-file.html">Upload File</a></li>
+				<li class="right-align"><a href="/about.html">About</a></li>
 			</ul>
 		</div>
 	</header>
 
 	<body class="body-style">
 		<br><br><br><br><br><br>
-		<form>
+		<form  enctype = "multipart/form-data"
+			action="cgi-bin/uploadFile.py" method="post">
 			Choose a file to upload:
-			<input type="file" id="fileToUpload" name="filename">
+			<input type="file" name="filename">
 			<input type="submit" value="Submit">
 		</form>
 	</body>

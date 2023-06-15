@@ -17,6 +17,23 @@ bool	ws::checkExtension(const std::string &file, const std::string &ext) {
 	return false;
 }
 
+bool	ws::checkNoExtension(const std::string &file) {
+	size_t	lastDot = file.find_last_of('.');
+
+	if (lastDot != std::string::npos && lastDot < file.size()) {
+		return false;
+	}
+	return true;
+}
+
 bool	ws::fileExists(const std::string &file) {
 	return access(file.c_str(), F_OK) == 0;
+}
+
+bool	ws::isDirectory(const std::string &path) {
+	struct stat	params;
+
+	if (stat(path.c_str(), &params) == 0)
+		return S_ISDIR(params.st_mode);
+	return false;
 }
