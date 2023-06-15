@@ -9,9 +9,16 @@
 import unittest
 # import httpx
 import requests
+import os
+from bs4 import BeautifulSoup
 
 url = "http://localhost:9999"
 error4 = "http://localhost:9999/bad"
+
+def remove_html_tags(html):
+	soup = BeautifulSoup(html, 'html.parser')
+	text = soup.get_text()
+	return text
 
 def test_root_url():
 	response = requests.get(url)
@@ -116,8 +123,15 @@ def	test_cgi_calculator_division():
 
 def test_autoindex():
 	url2 = "http://localhost:9999/autoindex"
+	expected_file_path = "../website/html/autoindex"
+	expected_files = os.listdir(expected_file_path)
 
 	response = requests.get(url2)
+	clean_text = remove_html_tags(response.text)
+	assert response.status_code == 200
+	for file in expected_files:
+		assert file in clean_text
+
 
 # def test_hhtp2_request():
 # 	with httpx.Client(http2=True) as client:
