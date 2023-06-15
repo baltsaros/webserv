@@ -62,6 +62,63 @@ def test_several_servers():
 		expected_content = file.read()
 	assert response.text == expected_content
 
+def	test_cgi_calculator_plus():
+	url2 = "http://localhost:9999/cgi-bin/calculator.py"
+	input_data = {
+		"num1": "10",
+		"num2": "5",
+		"operator": "+"
+	}
+	expected_output = "\t\t <h2>10 + 5 = 15</h2>"
+	response = requests.post(url2, data=input_data)
+	lines = response.text.splitlines()
+	assert response.status_code == 200
+	assert lines[26] == expected_output
+
+def	test_cgi_calculator_minus():
+	url2 = "http://localhost:9999/cgi-bin/calculator.py"
+	input_data = {
+		"num1": "10",
+		"num2": "5",
+		"operator": "-"
+	}
+	expected_output = "\t\t <h2>10 - 5 = 5</h2>"
+	response = requests.post(url2, data=input_data)
+	lines = response.text.splitlines()
+	assert response.status_code == 200
+	assert lines[26] == expected_output
+
+def	test_cgi_calculator_multiply():
+	url2 = "http://localhost:9999/cgi-bin/calculator.py"
+	input_data = {
+		"num1": "10",
+		"num2": "5",
+		"operator": "*"
+	}
+	expected_output = "\t\t <h2>10 * 5 = 50</h2>"
+	response = requests.post(url2, data=input_data)
+	lines = response.text.splitlines()
+	assert response.status_code == 200
+	assert lines[26] == expected_output
+
+def	test_cgi_calculator_division():
+	url2 = "http://localhost:9999/cgi-bin/calculator.py"
+	input_data = {
+		"num1": "10",
+		"num2": "5",
+		"operator": "/"
+	}
+	expected_output = "\t\t <h2>10 / 5 = 2.0</h2>"
+	response = requests.post(url2, data=input_data)
+	lines = response.text.splitlines()
+	assert response.status_code == 200
+	assert lines[26] == expected_output
+
+def test_autoindex():
+	url2 = "http://localhost:9999/autoindex"
+
+	response = requests.get(url2)
+
 # def test_hhtp2_request():
 # 	with httpx.Client(http2=True) as client:
 # 		response = client.get(url)
