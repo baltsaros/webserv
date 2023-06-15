@@ -98,7 +98,9 @@ void	ws::Request::_checkPath() {
 	bool	aiFlag = false;
 	bool	findLocation = false;
 
-	tmp = _locations.find(_target);
+	// tmp = _locations.find(_target);
+	tmp = _findLocation();
+	std::cout << "key: " << tmp->first << "\n";
 	do {
 		_autoIndexFlag = false;
 		_returnStatus = -1;
@@ -226,6 +228,23 @@ void	ws::Request::_parseGetTarget(void)
 		_target.erase(pos2, std::string::npos);
 	}
 	_queryString.erase(0, pos2 + 1);
+}
+
+std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
+
+	std::string	target;
+	// ConfigLocation	*tmp;
+	int			pos = 42;
+	
+	target = _target;
+	// tmp = _locations.find(target);
+	while (pos != 0 && _locations[target] == NULL) {
+		pos = target.find_last_of('/');
+		target = target.substr(0, pos);
+	}
+	if (pos == 0)
+		target = "/";
+	return _locations.find(target);
 }
 
 // Setters

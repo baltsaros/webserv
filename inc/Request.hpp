@@ -35,6 +35,7 @@ class Request {
 		void									_parseStartingLine();
 		void									_parseHeaderFields();
 		void									_parseGetTarget();
+		std::map<std::string, ConfigLocation *>::iterator							_findLocation();
 
 	public:
 		Request();
