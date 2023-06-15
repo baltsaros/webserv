@@ -97,10 +97,9 @@ void	ws::Request::_checkPath() {
 	do {
 		_autoIndexFlag = false;
 		_returnStatus = -1;
-		// creating a filepath for recv(); if _target has .css/.ico extension
-		// it looks for /assets location; if target is /, it returns a home page
-		// in all other cases it appends _target to the root path
-		
+		// searching for a proper location to create path;
+		// if target and location name are the same, then go to condition 2
+		// in order to have proper autoindex and methods
 		if (!_target.compare("/"))
 			_path = it->second->getRoot() + "/" + it->second->getIndex();
 		else if (tmp != itEnd && tmp->second->getRoot().size()) {
