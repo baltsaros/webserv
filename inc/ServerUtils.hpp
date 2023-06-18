@@ -13,4 +13,5 @@ namespace ws {
 	bool		checkNoExtension(const std::string &file);
 	bool		fileExists(const std::string &file);
 	bool		isDirectory(const std::string &path);
+	void		trimTrailingChar(std::string &str, char trail);
 }
