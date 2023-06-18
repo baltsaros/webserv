@@ -74,52 +74,60 @@ def	test_cgi_calculator_plus():
 	input_data = {
 		"num1": "10",
 		"num2": "5",
-		"operator": "+"
+		"operator": "plus"
 	}
-	expected_output = "\t\t <h2>10 + 5 = 15</h2>"
+	expected_output = "10 + 5 = 15"
 	response = requests.post(url2, data=input_data)
-	lines = response.text.splitlines()
+	clean_text = remove_html_tags(response.text)
+	lines = clean_text.splitlines()
+	print(lines[25])
 	assert response.status_code == 200
-	assert lines[26] == expected_output
+	assert lines[25] == expected_output
 
 def	test_cgi_calculator_minus():
 	url2 = "http://localhost:9999/cgi-bin/calculator.py"
 	input_data = {
 		"num1": "10",
 		"num2": "5",
-		"operator": "-"
+		"operator": "minus"
 	}
-	expected_output = "\t\t <h2>10 - 5 = 5</h2>"
+	expected_output = "10 - 5 = 5"
 	response = requests.post(url2, data=input_data)
-	lines = response.text.splitlines()
+	clean_text = remove_html_tags(response.text)
+	lines = clean_text.splitlines()
+	print(lines[25])
 	assert response.status_code == 200
-	assert lines[26] == expected_output
+	assert lines[25] == expected_output
 
 def	test_cgi_calculator_multiply():
 	url2 = "http://localhost:9999/cgi-bin/calculator.py"
 	input_data = {
 		"num1": "10",
 		"num2": "5",
-		"operator": "*"
+		"operator": "multiply"
 	}
-	expected_output = "\t\t <h2>10 * 5 = 50</h2>"
+	expected_output = "10 * 5 = 50"
 	response = requests.post(url2, data=input_data)
-	lines = response.text.splitlines()
+	clean_text = remove_html_tags(response.text)
+	lines = clean_text.splitlines()
+	print(lines[25])
 	assert response.status_code == 200
-	assert lines[26] == expected_output
+	assert lines[25] == expected_output
 
 def	test_cgi_calculator_division():
 	url2 = "http://localhost:9999/cgi-bin/calculator.py"
 	input_data = {
 		"num1": "10",
 		"num2": "5",
-		"operator": "/"
+		"operator": "divide"
 	}
-	expected_output = "\t\t <h2>10 / 5 = 2.0</h2>"
+	expected_output = "10 / 5 = 2.0"
 	response = requests.post(url2, data=input_data)
-	lines = response.text.splitlines()
+	clean_text = remove_html_tags(response.text)
+	lines = clean_text.splitlines()
+	print(lines[25])
 	assert response.status_code == 200
-	assert lines[26] == expected_output
+	assert lines[25] == expected_output
 
 def test_autoindex():
 	url2 = "http://localhost:9999/autoindex"
@@ -133,7 +141,7 @@ def test_autoindex():
 		assert file in clean_text
 
 
-# def test_hhtp2_request():
+# def test_http2_request():
 # 	with httpx.Client(http2=True) as client:
 # 		response = client.get(url)
 # 	with open("../website/html/error_pages/400.html") as file:
