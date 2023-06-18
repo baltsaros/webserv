@@ -93,6 +93,7 @@ void	ws::CgiHandler::initializeEnv(void)
 	this->_envVariables[SCRIPT_FILENAME] = createEnvString(SCRIPT_FILENAME, this->_req.getTarget());
 	this->_envVariables[SCRIPT_NAME] = createEnvString(SCRIPT_NAME, this->_req.getTarget());
 	this->_envVariables[SERVER_PROTOCOL] = createEnvString(SERVER_PROTOCOL, this->_req.getProtocol());
+	this->_envVariables[QUERY_STRING] = createEnvString(QUERY_STRING, this->_req.getQueryString());
 }
 
 /*
@@ -113,6 +114,7 @@ int	ws::CgiHandler::execute(void)
 					&this->_envVariables[SCRIPT_FILENAME][0],
 					&this->_envVariables[SCRIPT_NAME][0],
 					&this->_envVariables[SERVER_PROTOCOL][0],
+					&this->_envVariables[QUERY_STRING][0],
 					NULL};
 	int pipe_in[2];
 	int pipe_out[2];
