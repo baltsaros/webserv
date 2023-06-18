@@ -105,15 +105,14 @@ void	ws::Request::_checkPath() {
 		// searching for a proper location to create path;
 		// if target and location name are the same, then go to condition 2
 		// in order to have proper autoindex and methods
-		std::cout << "name: " << it->first << std::endl;
-		std::cout << "target: " << _target << std::endl;
+		// std::cout << "name: " << it->first << std::endl;
+		// std::cout << "target: " << _target << std::endl;
 		if (!_target.compare("/"))
 			_path = it->second->getRoot() + "/" + it->second->getIndex();
 		else if (tmp != itEnd && tmp->second->getRoot().size()) {
 			it = tmp;
 			trimTrailingChar(_target, '/');
 			_path = it->second->getRoot();
-			std::cout << "not empty: " << tmp->first << std::endl;
 		}
 		else {
 			trimTrailingChar(_target, '/');
@@ -126,7 +125,7 @@ void	ws::Request::_checkPath() {
 			_autoIndexFlag = true;
 		else if (ws::checkNoExtension(_path))
 			_path += ".html";
-		std::cout << "path: " << _path << std::endl;
+		// std::cout << "path: " << _path << std::endl;
 		// std::cout << "exist: " << fileExists(_path) << std::endl;
 		// if file at _path does not exist, return error 404
 		if (ws::fileExists(_path)) {
