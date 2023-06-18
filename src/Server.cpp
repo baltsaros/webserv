@@ -129,7 +129,7 @@ int		ws::Server::_responder(int sockfd) {
 		toSend = response.getResponse();
 		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
 	}
-	else if (_checkCgi(this->_req))
+	else if (_checkCgi(this->_req) && !(this->_req.getReturnStatus() >= 0))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		ret = cgi.execute();
@@ -260,9 +260,8 @@ void	ws::Server::test_connection(int to_test) {
 */
 bool	ws::Server::_checkCgi(Request & req)
 {
-	if (req.getMethod() != "POST") return (false);
 	if (req.getPath() == PATH_CGI_SCRIPT) return (true);
-	if (req.getPath() == PATH_UPLOAD_SCRIPT) return (true);
+	if (req.getPath() == PATH_UPLOAD_SCRIPT && req.getMethod() == "POST") return (true);
 	return (false);
 }
 

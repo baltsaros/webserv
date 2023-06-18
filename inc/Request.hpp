@@ -26,6 +26,7 @@ class Request {
 		std::string								_response;
 		int										_returnStatus;
 		bool									_autoIndexFlag;
+		std::string								_queryString;
 		std::map<std::string, ConfigLocation *>	_locations;
 		void									_checkPos(size_t pos);
 		std::string								_getParam(std::string toGet, size_t offset);
@@ -33,6 +34,7 @@ class Request {
 		bool									_checkMethod(std::vector<std::string> methods);
 		void									_parseStartingLine();
 		void									_parseHeaderFields();
+		void									_parseGetTarget();
 
 	public:
 		Request();
@@ -59,5 +61,7 @@ class Request {
 		std::string							getResponse() const;
 		int									getReturnStatus() const;
 		bool								getAutoIndexFlag() const;
+		std::string							getQueryString() const;
+		void								setPath(std::string & path);
 };
 }
