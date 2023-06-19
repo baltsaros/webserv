@@ -94,8 +94,10 @@ void	ws::Request::readBuffer() {
 void	ws::Request::_checkPath() {
 
 	std::map<std::string, ConfigLocation *>::iterator	tmp;
+	std::string	target;
 
 	tmp = _findLocation();
+	target = _target;
 	// std::cout << "key: " << tmp->first << "\n";
 	// std::cout << "target: " << _target << "\n";
 	_autoIndexFlag = false;
@@ -109,9 +111,9 @@ void	ws::Request::_checkPath() {
 		return ;
 	}
 	if (tmp->first.compare(ASSETS) && tmp->first.compare(SLASH)) {
-		_target.erase(0, tmp->first.size());
+		target.erase(0, tmp->first.size());
 	}
-	_path = tmp->second->getRoot() + _target;
+	_path = tmp->second->getRoot() + target;
 	std::cout << "path: " << _path << "\n";
 	ws::trimTrailingChar(_path, '/');
 	if (!isDirectory(_path)) {
