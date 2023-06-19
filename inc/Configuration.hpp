@@ -6,7 +6,7 @@
 /*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:14:14 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 15:22:09 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/06/19 12:22:24 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <iterator>
 # include <vector>
 # include "ConfigServer.hpp"
+# include "ServerUtils.hpp"
 
 # define START_SERVER_BLOCK	"server {"
 # define END_SERVER_BLOCK	"\n}"
