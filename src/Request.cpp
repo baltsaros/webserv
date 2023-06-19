@@ -100,7 +100,7 @@ void	ws::Request::_checkPath() {
 
 	// tmp = _locations.find(_target);
 	tmp = _findLocation();
-	std::cout << "key: " << tmp->first << "\n";
+	// std::cout << "key: " << tmp->first << "\n";
 	do {
 		_autoIndexFlag = false;
 		_returnStatus = -1;
@@ -245,6 +245,7 @@ std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
 	}
 	if (pos == 0)
 		target = "/";
+	// std::cout << "new target: " << target << "\n";
 	return _locations.find(target);
 }
 
