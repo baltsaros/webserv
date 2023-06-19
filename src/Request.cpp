@@ -98,8 +98,8 @@ void	ws::Request::_checkPath() {
 	bool	aiFlag = false;
 	bool	findLocation = false;
 
-	// tmp = _locations.find(_target);
-	tmp = _findLocation();
+	tmp = _locations.find(_target);
+	// tmp = _findLocation();
 	// std::cout << "key: " << tmp->first << "\n";
 	do {
 		_autoIndexFlag = false;
@@ -231,23 +231,23 @@ void	ws::Request::_parseGetTarget(void)
 	_queryString.erase(0, pos2 + 1);
 }
 
-std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
+// std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
 
-	std::string	target;
-	// ConfigLocation	*tmp;
-	int			pos = 42;
+// 	std::string	target;
+// 	// ConfigLocation	*tmp;
+// 	int			pos = 42;
 	
-	target = _target;
-	// tmp = _locations.find(target);
-	while (pos != 0 && _locations[target] == NULL) {
-		pos = target.find_last_of('/');
-		target = target.substr(0, pos);
-	}
-	if (pos == 0)
-		target = "/";
-	// std::cout << "new target: " << target << "\n";
-	return _locations.find(target);
-}
+// 	target = _target;
+// 	// tmp = _locations.find(target);
+// 	while (pos != 0 && _locations[target] == NULL) {
+// 		pos = target.find_last_of('/');
+// 		target = target.substr(0, pos);
+// 	}
+// 	if (pos == 0)
+// 		target = "/";
+// 	// std::cout << "new target: " << target << "\n";
+// 	return _locations.find(target);
+// }
 
 // Setters
 void	ws::Request::setReturnStatus(int code) {_returnStatus = code;}

@@ -6,7 +6,7 @@
 /*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/01 15:24:11 by ejoo-tho         ###   ########.fr       */
+/*   Updated: 2023/06/19 12:20:08 by ejoo-tho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,13 @@ void	Configuration::createConfigBlocks(std::string const & path) {
 	size_t			posb = 0;
 	size_t			pose = 0;
 
+	if (!ws::checkExtension(path, ".conf")) {
+		std::cout << "Error : wrong file extension\n";
+		exit(EXIT_FAILURE) ;
+	}
 	ifs.open(path);
 	if (ifs.fail()) {
-		std::cout << "Error : file couldn't open\n";
+		std::cout << "Error : nothing in the file\n";
 		exit(EXIT_FAILURE) ; // gestion d'erreur?
 	}
 	std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
