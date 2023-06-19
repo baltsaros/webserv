@@ -14,4 +14,6 @@ namespace ws {
 	bool		fileExists(const std::string &file);
 	bool		isDirectory(const std::string &path);
 	void		trimTrailingChar(std::string &str, char trail);
+	void		trimOneBlock(std::string &str, char separ);
+	std::string	removeRootPath(const std::string &target, const std::string &root);
 }

@@ -44,3 +44,21 @@ void	ws::trimTrailingChar(std::string &str, char trail) {
 	if (pos != std::string::npos)
 		str.erase(pos + 1);
 }
+
+
+void	ws::trimOneBlock(std::string &str, char trail) {
+	size_t	pos = str.find_last_of(trail);
+
+	if (pos != std::string::npos)
+		str.erase(pos);
+}
+
+std::string	ws::removeRootPath(const std::string &target, const std::string &root) {
+	std::string	toReturn = target;
+
+	if (!root.compare("/"))
+		return target;
+	if (!toReturn.find(root))
+		toReturn.erase(0, root.size());
+	return toReturn;
+}

@@ -92,56 +92,66 @@ void	ws::Request::readBuffer() {
 }
 
 void	ws::Request::_checkPath() {
-	std::map<std::string, ConfigLocation *>::iterator	tmp;
-	std::map<std::string, ConfigLocation *>::iterator	it = _locations.begin();
-	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
-	bool	aiFlag = false;
-	bool	findLocation = false;
+	std::string	shortTarget;
+	bool		aiFlag = false;
 
-	tmp = _locations.find(_target);
+	shortTarget = _checkTarget();
+	_autoIndexFlag = false;
+	_returnStatus = -1;
+	// std::cout << "new_tar: " << shortTarget << std::endl;
+	// std::cout << "target: " << _target << std::endl;
+	// two main cases: root path that requires path to the index page
+	// or any other page
+	if (!_target.compare(shortTarget) && _locations[shortTarget]->getRoot().size() > 0) {
+		_path = _locations[shortTarget]->getRoot() + "/" + _locations[shortTarget]->getIndex();
+		// _path = _locations[shortTarget]->getRoot();
+	}
+	else if (_locations[shortTarget]->getRoot().size() > 0)
+		_path = _locations[shortTarget]->getRoot() + removeRootPath(_target, shortTarget);
+	else
+		_returnStatus = 404;
+	aiFlag = _locations[shortTarget]->getAutoIndex();
+	// std::cout << "path: " << _path << std::endl;
+	// check if the file is directory or not; if it has no extension, append .html
+	if (aiFlag && isDirectory(_path))
+		_autoIndexFlag = true;
+	else if (ws::checkNoExtension(_path))
+		_path += ".html";
+	// if file at _path does not exist, return error 404
+	if (ws::fileExists(_path)) {
+		if (!_checkMethod(_locations[shortTarget]->getMethods())) {
+			_returnStatus = 405;
+		}
+	}
+	else
+		_returnStatus = 404;
+}
+
+std::string	ws::Request::_checkTarget() {
+	std::map<std::string, ConfigLocation *>::iterator	tmp;
+	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
+	std::string	newTarget;
+
+	// trim all trailing /
+	if (_target.compare("/"))
+		trimTrailingChar(_target, '/');
+	newTarget = _target;
+	// recursively look for a proper location name;
+	// if target was not found -> remove all characters at the end until
+	// and including /; repeat until a proper location is found
+	// or target is ""; in the latter case makes it equal to "/"
 	do {
-		_autoIndexFlag = false;
-		_returnStatus = -1;
-		// searching for a proper location to create path;
-		// if target and location name are the same, then go to condition 2
-		// in order to have proper autoindex and methods
-		std::cout << "name: " << it->first << std::endl;
-		std::cout << "target: " << _target << std::endl;
-		if (!_target.compare("/"))
-			_path = it->second->getRoot() + "/" + it->second->getIndex();
-		else if (tmp != itEnd && tmp->second->getRoot().size()) {
-			it = tmp;
-			trimTrailingChar(_target, '/');
-			_path = it->second->getRoot();
-			std::cout << "not empty: " << tmp->first << std::endl;
+		tmp = _locations.find(newTarget);
+		if (tmp == itEnd)
+			trimOneBlock(newTarget, '/');
+		else
+			break ;
+		if (!newTarget.size()) {
+			newTarget = "/";
+			break ;
 		}
-		else {
-			trimTrailingChar(_target, '/');
-			_path = it->second->getRoot() + _target;
-		}
-		aiFlag = it->second->getAutoIndex();
-		// std::cout << "flag: " << aiFlag << std::endl;
-		// check if directory exists or not; otherwise append ".html"
-		if (aiFlag && isDirectory(_path))
-			_autoIndexFlag = true;
-		else if (ws::checkNoExtension(_path))
-			_path += ".html";
-		std::cout << "path: " << _path << std::endl;
-		// std::cout << "exist: " << fileExists(_path) << std::endl;
-		// if file at _path does not exist, return error 404
-		if (ws::fileExists(_path)) {
-			findLocation = true;
-			if (!_checkMethod(it->second->getMethods())) {
-				_returnStatus = 405;
-				break ;
-			}
-		}
-		++it;
-		if (it == itEnd && !findLocation) {
-			findLocation = true;
-			_returnStatus = 404;
-		}
-	} while (findLocation != true);
+	} while (newTarget.compare("/"));
+	return newTarget;
 }
 
 bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
