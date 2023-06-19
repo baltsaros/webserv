@@ -1,21 +1,21 @@
 #include <iostream>
-#include "./inc/Configuration.hpp"
 // #include <fstream>
 // #include "./inc/Request.hpp"
 
+	void	trimTrailingChar(std::string &str, char trail) {
+	size_t	pos = str.find_last_not_of(trail);
+
+	if (pos != std::string::npos)
+		str.erase(pos + 1);
+	}
+
 int main()
 {
-	// std::ifstream	ifs; 
-	
-	// ifs.open("request.txt");
-	// if (ifs.fail()) {
-	// 	std::cout << "Error : file couldn't open\n";
-	// 	exit(EXIT_FAILURE) ; // gestion d'erreur?
-	// }
-	// std::string	content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
-	// Request	test(content);
-	// ifs.close();
-
-	Configuration	config("./config/config.conf");
+	std::string str = "test/index/";
+	trimTrailingChar(str, '/');
+	std::string str2 = "test/index";
+	trimTrailingChar(str2, '/');
+	std::cout << "first " << str << "\n";
+	std::cout << "second " << str2 << "\n";
 	return (0);
 }
