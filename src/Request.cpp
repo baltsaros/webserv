@@ -108,6 +108,9 @@ void	ws::Request::_checkPath() {
 		_path = tmp->second->getRoot() + _target;
 		return ;
 	}
+	if (tmp->first.compare(ASSETS) && tmp->first.compare(SLASH)) {
+		_target.erase(0, tmp->first.size());
+	}
 	_path = tmp->second->getRoot() + _target;
 	std::cout << "path: " << _path << "\n";
 	ws::trimTrailingChar(_path, '/');
