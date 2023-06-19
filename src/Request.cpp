@@ -104,19 +104,22 @@ void	ws::Request::_checkPath() {
 	do {
 		_autoIndexFlag = false;
 		_returnStatus = -1;
-		// creating a filepath for recv(); if _target has .css/.ico extension
-		// it looks for /assets location; if target is /, it returns a home page
-		// in all other cases it appends _target to the root path
-		
+		// searching for a proper location to create path;
+		// if target and location name are the same, then go to condition 2
+		// in order to have proper autoindex and methods
+		// std::cout << "name: " << it->first << std::endl;
+		// std::cout << "target: " << _target << std::endl;
 		if (!_target.compare("/"))
 			_path = it->second->getRoot() + "/" + it->second->getIndex();
 		else if (tmp != itEnd && tmp->second->getRoot().size()) {
 			it = tmp;
+			trimTrailingChar(_target, '/');
 			_path = it->second->getRoot();
-			std::cout << "not empty: " << tmp->first << std::endl;
 		}
-		else
+		else {
+			trimTrailingChar(_target, '/');
 			_path = it->second->getRoot() + _target;
+		}
 		aiFlag = it->second->getAutoIndex();
 		// std::cout << "flag: " << aiFlag << std::endl;
 		// check if directory exists or not; otherwise append ".html"
@@ -124,9 +127,7 @@ void	ws::Request::_checkPath() {
 			_autoIndexFlag = true;
 		else if (ws::checkNoExtension(_path))
 			_path += ".html";
-		std::cout << "name: " << it->first << std::endl;
-		std::cout << "target: " << _target << std::endl;
-		std::cout << "path: " << _path << std::endl;
+		// std::cout << "path: " << _path << std::endl;
 		// std::cout << "exist: " << fileExists(_path) << std::endl;
 		// if file at _path does not exist, return error 404
 		if (ws::fileExists(_path)) {
