@@ -32,8 +32,15 @@ bool	ws::fileExists(const std::string &file) {
 
 bool	ws::isDirectory(const std::string &path) {
 	struct stat	params;
-
+	//std::cout << "directory path " << path << "\n";
 	if (stat(path.c_str(), &params) == 0)
 		return S_ISDIR(params.st_mode);
 	return false;
+}
+
+void	ws::trimTrailingChar(std::string &str, char trail) {
+	size_t	pos = str.find_last_not_of(trail);
+
+	if (pos != std::string::npos)
+		str.erase(pos + 1);
 }
