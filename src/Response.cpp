@@ -64,8 +64,15 @@ void	ws::Response::checkRequest() {
 		case 405:
 			_response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
+		case 411:
+			_response = "HTTP/1.1 411 Length Required\r\n";
+			break;
 		case 413:
 			_response = "HTTP/1.1 413 Content Too Large\r\n";
+			break;
+		case 501:
+			_response = "HTTP/1.1 501 Not Implemented\r\n";
+			break;
 		default:
 			break;
 	}
@@ -86,14 +93,13 @@ std::string	ws::Response::createAutoIndex() {
 	DIR					*dir;
 	struct dirent		*entry;
 
-	// std::cout << "target in response: " << target << std::endl;
-	// std::cout << "path in response: " << path << std::endl;
+	 std::cout << "target in response: " << target << std::endl;
+	 std::cout << "path in response: " << path << std::endl;
 	buf << "<!DOCTYPE html>\n";
 	buf << "<html lang=\"en\">\n";
 	buf << "<head><title>AutoIndex for " << path << "</title></head>\n";
 	buf << "<body>\n";
 	buf << "<ul>\n";
-	// buf << "<h1>\n";
 	dir = opendir(path.c_str());
 	if (!dir) {
 		std::cerr << "Could not open the directory" << std::endl;
@@ -106,13 +112,16 @@ std::string	ws::Response::createAutoIndex() {
 				entry = readdir(dir);
 				continue ;
 			}
-			buf << "<li><a href=\"" << target + "/" + entry->d_name << "\">";
+			if (!fileExists(path + target + entry->d_name)
+				&& target[target.size() - 1] != '/')
+				buf << "<li><a href=\"" << target + "/" + entry->d_name << "\">";
+			else
+				buf << "<li><a href=\"" << target + entry->d_name << "\">";
 			buf << entry->d_name << "</a></li>\n";
 			entry = readdir(dir);
 		}
 	}
 	closedir(dir);
-	// buf << "</h1>\n";
 	buf << "</ul>\n";
 	buf << "</body>\n";
 	buf << "</html>\n";

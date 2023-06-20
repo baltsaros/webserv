@@ -81,77 +81,70 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
-	if (this->_body.size() > this->_config->getClientMaxBodySize())
+	if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
+		this->_returnStatus < 0 && this->_method == "POST")
+	{
+		std::cerr << "Content length is missing with request POST\n";
+		this->_returnStatus = 411;
+		return ;
+	}
+	if (this->_body.size() > this->_config->getClientMaxBodySize() &&
+		this->_returnStatus < 0)
 	{
 		std::cerr << "Body size is higher than client max body size field\n";
 		this->_returnStatus = 413;
 		return ;
 	}
+	if (this->_returnStatus < 0 && this->_method == "POST" &&
+		this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
+		{
+			std::cerr << "Body size doesn't match content length\n";
+			this->_returnStatus = 501;
+			return ;
+		}
 	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 }
 
 void	ws::Request::_checkPath() {
-	std::string	shortTarget;
-	bool		aiFlag = false;
 
-	shortTarget = _checkTarget();
+	std::map<std::string, ConfigLocation *>::iterator	tmp;
+	std::string	target;
+
+	tmp = _findLocation();
+	target = _target;
+	// std::cout << "key: " << tmp->first << "\n";
+	// std::cout << "target: " << _target << "\n";
 	_autoIndexFlag = false;
 	_returnStatus = -1;
-	// std::cout << "new_tar: " << shortTarget << std::endl;
-	// std::cout << "target: " << _target << std::endl;
-	// two main cases: root path that requires path to the index page
-	// or any other page
-	if (!_target.compare(shortTarget) && _locations[shortTarget]->getRoot().size() > 0) {
-		_path = _locations[shortTarget]->getRoot() + "/" + _locations[shortTarget]->getIndex();
-		// _path = _locations[shortTarget]->getRoot();
+	if (!_checkMethod(tmp->second->getMethods())) {
+		_returnStatus = 405;
+		return ;
 	}
-	else if (_locations[shortTarget]->getRoot().size() > 0)
-		_path = _locations[shortTarget]->getRoot() + removeRootPath(_target, shortTarget);
-	else
-		_returnStatus = 404;
-	aiFlag = _locations[shortTarget]->getAutoIndex();
-	// std::cout << "path: " << _path << std::endl;
-	// check if the file is directory or not; if it has no extension, append .html
-	if (aiFlag && isDirectory(_path))
-		_autoIndexFlag = true;
-	else if (ws::checkNoExtension(_path))
-		_path += ".html";
-	// if file at _path does not exist, return error 404
-	if (ws::fileExists(_path)) {
-		if (!_checkMethod(_locations[shortTarget]->getMethods())) {
-			_returnStatus = 405;
-		}
+	if (!tmp->first.compare(ASSETS)) {
+		_path = tmp->second->getRoot() + _target;
+		return ;
 	}
-	else
-		_returnStatus = 404;
-}
-
-std::string	ws::Request::_checkTarget() {
-	std::map<std::string, ConfigLocation *>::iterator	tmp;
-	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
-	std::string	newTarget;
-
-	// trim all trailing /
-	if (_target.compare("/"))
-		trimTrailingChar(_target, '/');
-	newTarget = _target;
-	// recursively look for a proper location name;
-	// if target was not found -> remove all characters at the end until
-	// and including /; repeat until a proper location is found
-	// or target is ""; in the latter case makes it equal to "/"
-	do {
-		tmp = _locations.find(newTarget);
-		if (tmp == itEnd)
-			trimOneBlock(newTarget, '/');
+	if (tmp->first.compare(ASSETS) && tmp->first.compare(SLASH)) {
+		target.erase(0, tmp->first.size());
+	}
+	_path = tmp->second->getRoot() + target;
+	// std::cout << "path: " << _path << "\n";
+	ws::trimTrailingChar(_path, '/');
+	if (!isDirectory(_path)) {
+		if (ws::checkNoExtension(_path))
+			_path += ".html";
+		if (!ws::fileExists(_path))
+			_returnStatus = 404;
+	}
+	else {
+		if (tmp->second->getAutoIndex())
+			_autoIndexFlag = true;
 		else
-			break ;
-		if (!newTarget.size()) {
-			newTarget = "/";
-			break ;
-		}
-	} while (newTarget.compare("/"));
-	return newTarget;
+			_path += SLASH + tmp->second->getIndex();
+	}
+	// std::cout << "autoindex: " << _autoIndexFlag << "\n";
+	// std::cout << "return status: " << _returnStatus << "\n";
 }
 
 bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
@@ -238,6 +231,24 @@ void	ws::Request::_parseGetTarget(void)
 		_target.erase(pos2, std::string::npos);
 	}
 	_queryString.erase(0, pos2 + 1);
+}
+
+std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
+
+	std::string	target;
+	// ConfigLocation	*tmp;
+	int			pos = 42;
+	
+	target = _target;
+	// tmp = _locations.find(target);
+	while (pos != 0 && _locations[target] == NULL) {
+		pos = target.find_last_of('/');
+		target = target.substr(0, pos);
+	}
+	if (pos == 0)
+		target = "/";
+	// std::cout << "new target: " << target << "\n";
+	return _locations.find(target);
 }
 
 // Setters

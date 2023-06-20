@@ -32,7 +32,7 @@ bool	ws::fileExists(const std::string &file) {
 
 bool	ws::isDirectory(const std::string &path) {
 	struct stat	params;
-
+	//std::cout << "directory path " << path << "\n";
 	if (stat(path.c_str(), &params) == 0)
 		return S_ISDIR(params.st_mode);
 	return false;

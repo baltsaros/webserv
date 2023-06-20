@@ -10,6 +10,9 @@
 # define COLON		":"
 # define SPACE		" "
 # define NEWLINE	"\n"
+# define SLASH		"/"
+# define ASSETS	"/assets"
+# define CONTENT_LENGTH_FIELD "Content-Length"
 
 namespace ws {
 class Request {
@@ -31,11 +34,11 @@ class Request {
 		void									_checkPos(size_t pos);
 		std::string								_getParam(std::string toGet, size_t offset);
 		void									_checkPath();
-		std::string								_checkTarget();
 		bool									_checkMethod(std::vector<std::string> methods);
 		void									_parseStartingLine();
 		void									_parseHeaderFields();
 		void									_parseGetTarget();
+		std::map<std::string, ConfigLocation *>::iterator							_findLocation();
 
 	public:
 		Request();
