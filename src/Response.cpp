@@ -64,8 +64,13 @@ void	ws::Response::checkRequest() {
 		case 405:
 			_response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
+		case 411:
+			_response = "HTTP/1.1 411 Length Required\r\n";
+			break;
 		case 413:
 			_response = "HTTP/1.1 413 Content Too Large\r\n";
+		case 501:
+			_response = "HTTP/1.1 501 Not Implemented\r\n";
 		default:
 			break;
 	}

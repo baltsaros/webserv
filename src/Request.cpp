@@ -81,6 +81,13 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
+	if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
+		this->_returnStatus < 0 && this->_method == "POST")
+	{
+		std::cerr << "Content length is missing with request POST\n";
+		this->_returnStatus = 411;
+		return ;
+	}
 	if (this->_body.size() > this->_config->getClientMaxBodySize() &&
 		this->_returnStatus < 0)
 	{
@@ -88,6 +95,13 @@ void	ws::Request::readBuffer() {
 		this->_returnStatus = 413;
 		return ;
 	}
+	if (this->_returnStatus < 0 && this->_method == "POST" &&
+		this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
+		{
+			std::cerr << "Body size doesn't match content length\n";
+			this->_returnStatus = 501;
+			return ;
+		}
 	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 }

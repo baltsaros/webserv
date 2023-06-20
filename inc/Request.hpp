@@ -12,6 +12,7 @@
 # define NEWLINE	"\n"
 # define SLASH		"/"
 # define ASSETS	"/assets"
+# define CONTENT_LENGTH_FIELD "Content-Length"
 
 namespace ws {
 class Request {
