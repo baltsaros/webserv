@@ -69,8 +69,10 @@ void	ws::Response::checkRequest() {
 			break;
 		case 413:
 			_response = "HTTP/1.1 413 Content Too Large\r\n";
+			break;
 		case 501:
 			_response = "HTTP/1.1 501 Not Implemented\r\n";
+			break;
 		default:
 			break;
 	}
