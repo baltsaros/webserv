@@ -1,6 +1,7 @@
 #pragma once
 
 # include "Server.hpp"
+# include "ServerUtils.hpp"
 
 namespace ws {
 class Response {

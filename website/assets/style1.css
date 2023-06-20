@@ -64,6 +64,11 @@ li a:hover
 	background-color: #99FFFF;
 }
 
+.body-style-bis
+{
+	background-color: red;
+}
+
 input
 {
 	width: 100%;

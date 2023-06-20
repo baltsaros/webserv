@@ -81,7 +81,8 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
-	if (this->_body.size() > this->_config->getClientMaxBodySize())
+	if (this->_body.size() > this->_config->getClientMaxBodySize() &&
+		this->_returnStatus < 0)
 	{
 		std::cerr << "Body size is higher than client max body size field\n";
 		this->_returnStatus = 413;
