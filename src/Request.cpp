@@ -81,7 +81,8 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
-	if (this->_body.size() > this->_config->getClientMaxBodySize())
+	if (this->_body.size() > this->_config->getClientMaxBodySize() &&
+		this->_returnStatus < 0)
 	{
 		std::cerr << "Body size is higher than client max body size field\n";
 		this->_returnStatus = 413;
@@ -92,56 +93,99 @@ void	ws::Request::readBuffer() {
 }
 
 void	ws::Request::_checkPath() {
-	std::map<std::string, ConfigLocation *>::iterator	tmp;
-	std::map<std::string, ConfigLocation *>::iterator	it = _locations.begin();
-	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
-	bool	aiFlag = false;
-	bool	findLocation = false;
 
-	tmp = _locations.find(_target);
-	do {
-		_autoIndexFlag = false;
-		_returnStatus = -1;
-		// searching for a proper location to create path;
-		// if target and location name are the same, then go to condition 2
-		// in order to have proper autoindex and methods
-		// std::cout << "name: " << it->first << std::endl;
-		// std::cout << "target: " << _target << std::endl;
-		if (!_target.compare("/"))
-			_path = it->second->getRoot() + "/" + it->second->getIndex();
-		else if (tmp != itEnd && tmp->second->getRoot().size()) {
-			it = tmp;
-			trimTrailingChar(_target, '/');
-			_path = it->second->getRoot();
-		}
-		else {
-			trimTrailingChar(_target, '/');
-			_path = it->second->getRoot() + _target;
-		}
-		aiFlag = it->second->getAutoIndex();
-		// std::cout << "flag: " << aiFlag << std::endl;
-		// check if directory exists or not; otherwise append ".html"
-		if (aiFlag && isDirectory(_path))
-			_autoIndexFlag = true;
-		else if (ws::checkNoExtension(_path))
+	std::map<std::string, ConfigLocation *>::iterator	tmp;
+	std::string	target;
+
+	tmp = _findLocation();
+	target = _target;
+	// std::cout << "key: " << tmp->first << "\n";
+	// std::cout << "target: " << _target << "\n";
+	_autoIndexFlag = false;
+	_returnStatus = -1;
+	if (!_checkMethod(tmp->second->getMethods())) {
+		_returnStatus = 405;
+		return ;
+	}
+	if (!tmp->first.compare(ASSETS)) {
+		_path = tmp->second->getRoot() + _target;
+		return ;
+	}
+	if (tmp->first.compare(ASSETS) && tmp->first.compare(SLASH)) {
+		target.erase(0, tmp->first.size());
+	}
+	_path = tmp->second->getRoot() + target;
+	std::cout << "path: " << _path << "\n";
+	ws::trimTrailingChar(_path, '/');
+	if (!isDirectory(_path)) {
+		if (ws::checkNoExtension(_path))
 			_path += ".html";
-		// std::cout << "path: " << _path << std::endl;
-		// std::cout << "exist: " << fileExists(_path) << std::endl;
-		// if file at _path does not exist, return error 404
-		if (ws::fileExists(_path)) {
-			findLocation = true;
-			if (!_checkMethod(it->second->getMethods())) {
-				_returnStatus = 405;
-				break ;
-			}
-		}
-		++it;
-		if (it == itEnd && !findLocation) {
-			findLocation = true;
+		if (!ws::fileExists(_path))
 			_returnStatus = 404;
-		}
-	} while (findLocation != true);
+	}
+	else {
+		if (tmp->second->getAutoIndex())
+			_autoIndexFlag = true;
+		else
+			_path += SLASH + tmp->second->getIndex();
+	}
+	// std::cout << "autoindex: " << _autoIndexFlag << "\n";
+	// std::cout << "return status: " << _returnStatus << "\n";
 }
+
+// void	ws::Request::_checkPath() {
+// 	std::map<std::string, ConfigLocation *>::iterator	tmp;
+// 	std::map<std::string, ConfigLocation *>::iterator	it = _locations.begin();
+// 	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
+// 	bool	aiFlag = false;
+// 	bool	findLocation = false;
+
+// 	tmp = _locations.find(_target);
+// 	// tmp = _findLocation();
+// 	// std::cout << "key: " << tmp->first << "\n";
+// 	do {
+// 		_autoIndexFlag = false;
+// 		_returnStatus = -1;
+// 		// searching for a proper location to create path;
+// 		// if target and location name are the same, then go to condition 2
+// 		// in order to have proper autoindex and methods
+// 		// std::cout << "name: " << it->first << std::endl;
+// 		// std::cout << "target: " << _target << std::endl;
+// 		if (!_target.compare("/"))
+// 			_path = it->second->getRoot() + "/" + it->second->getIndex();
+// 		else if (tmp != itEnd && tmp->second->getRoot().size()) {
+// 			it = tmp;
+// 			trimTrailingChar(_target, '/');
+// 			_path = it->second->getRoot();
+// 		}
+// 		else {
+// 			trimTrailingChar(_target, '/');
+// 			_path = it->second->getRoot() + _target;
+// 		}
+// 		aiFlag = it->second->getAutoIndex();
+// 		// std::cout << "flag: " << aiFlag << std::endl;
+// 		// check if directory exists or not; otherwise append ".html"
+// 		if (aiFlag && isDirectory(_path))
+// 			_autoIndexFlag = true;
+// 		else if (ws::checkNoExtension(_path))
+// 			_path += ".html";
+// 		// std::cout << "path: " << _path << std::endl;
+// 		// std::cout << "exist: " << fileExists(_path) << std::endl;
+// 		// if file at _path does not exist, return error 404
+// 		if (ws::fileExists(_path)) {
+// 			findLocation = true;
+// 			if (!_checkMethod(it->second->getMethods())) {
+// 				_returnStatus = 405;
+// 				break ;
+// 			}
+// 		}
+// 		++it;
+// 		if (it == itEnd && !findLocation) {
+// 			findLocation = true;
+// 			_returnStatus = 404;
+// 		}
+// 	} while (findLocation != true);
+// }
 
 bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
 	std::vector<std::string>::iterator	it = methods.begin();
@@ -227,6 +271,24 @@ void	ws::Request::_parseGetTarget(void)
 		_target.erase(pos2, std::string::npos);
 	}
 	_queryString.erase(0, pos2 + 1);
+}
+
+std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
+
+	std::string	target;
+	// ConfigLocation	*tmp;
+	int			pos = 42;
+	
+	target = _target;
+	// tmp = _locations.find(target);
+	while (pos != 0 && _locations[target] == NULL) {
+		pos = target.find_last_of('/');
+		target = target.substr(0, pos);
+	}
+	if (pos == 0)
+		target = "/";
+	// std::cout << "new target: " << target << "\n";
+	return _locations.find(target);
 }
 
 // Setters

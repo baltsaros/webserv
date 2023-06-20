@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Configuration.cpp                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: ejoo-tho <ejoo-tho@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/11 13:26:20 by ejoo-tho          #+#    #+#             */
-/*   Updated: 2023/06/19 12:22:25 by ejoo-tho         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../inc/Configuration.hpp"
 
 
@@ -57,7 +45,7 @@ void	Configuration::createConfigBlocks(std::string const & path) {
 	}
 	ifs.open(path);
 	if (ifs.fail()) {
-		std::cout << "Error : file couldn't open\n";
+		std::cout << "Error : nothing in the file\n";
 		exit(EXIT_FAILURE) ; // gestion d'erreur?
 	}
 	std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
