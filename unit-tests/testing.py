@@ -12,7 +12,7 @@ import requests
 import os
 from bs4 import BeautifulSoup
 
-url = "http://localhost:9999"
+url = "http://localhost:9999/index"
 error4 = "http://localhost:9999/bad"
 
 def remove_html_tags(html):
@@ -42,7 +42,7 @@ def test_invalid_method():
 	assert response.text == expected_content
 
 def test_several_ports():
-	url2 = "http://localhost:9998"
+	url2 = "http://localhost:9998/index"
 	response = requests.get(url)
 	assert response.status_code == 200
 	with open("../website/html/index.html") as file:
@@ -56,7 +56,7 @@ def test_several_ports():
 	assert response.text == expected_content
 
 def test_several_servers():
-	url2 = "http://localhost:9997"
+	url2 = "http://localhost:9997/index"
 	response = requests.get(url)
 	assert response.status_code == 200
 	with open("../website/html/index.html") as file:
@@ -139,6 +139,16 @@ def test_autoindex():
 	assert response.status_code == 200
 	for file in expected_files:
 		assert file in clean_text
+
+def test_autoindex_off():
+	url2 = "http://localhost:9999/test"
+	with open("../website/html/test/index.html") as file:
+		expected_content = file.read()
+
+	response = requests.get(url2)
+	clean_text = remove_html_tags(response.text)
+	assert response.status_code == 200
+	assert response.text == expected_content
 
 
 # def test_http2_request():
