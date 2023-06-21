@@ -8,6 +8,7 @@
 # include <map>
 # include <sys/socket.h>
 # include <sys/wait.h>
+# include "Response.hpp"
 
 # define CONTENT_TYPE "CONTENT_TYPE"
 # define CONTENT_LENGTH "CONTENT_LENGTH"

@@ -81,13 +81,20 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
-	if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
-		this->_returnStatus < 0 && this->_method == "POST")
+	if (this->_headerFields.count("Transfer-Encoding") && 
+		this->_headerFields["Transfer-Encoding"] == "chunked\r")
 	{
-		std::cerr << "Content length is missing with request POST\n";
-		this->_returnStatus = 411;
-		return ;
+		//std::cout << "PROTU\n";
+		int contentLength = chunkRequest();
+		this->_headerFields[CONTENT_LENGTH_FIELD] = contentLength;
 	}
+	//if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
+	//	this->_returnStatus < 0 && this->_method == "POST")
+	//{
+	//	std::cerr << "Content length is missing with request POST\n";
+	//	this->_returnStatus = 411;
+	//	return ;
+	//}
 	if (this->_body.size() > this->_config->getClientMaxBodySize() &&
 		this->_returnStatus < 0)
 	{
@@ -95,13 +102,13 @@ void	ws::Request::readBuffer() {
 		this->_returnStatus = 413;
 		return ;
 	}
-	if (this->_returnStatus < 0 && this->_method == "POST" &&
-		this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
-		{
-			std::cerr << "Body size doesn't match content length\n";
-			this->_returnStatus = 501;
-			return ;
-		}
+	//if (this->_returnStatus < 0 && this->_method == "POST" &&
+	//	this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
+	//	{
+	//		std::cerr << "Body size doesn't match content length\n";
+	//		this->_returnStatus = 501;
+	//		return ;
+	//	}
 	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 }
@@ -129,7 +136,7 @@ void	ws::Request::_checkPath() {
 		target.erase(0, tmp->first.size());
 	}
 	_path = tmp->second->getRoot() + target;
-	std::cout << "path: " << _path << "\n";
+	//std::cout << "path: " << _path << "\n";
 	ws::trimTrailingChar(_path, '/');
 	if (!isDirectory(_path)) {
 		if (ws::checkNoExtension(_path))
@@ -303,6 +310,36 @@ std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
 		target = "/";
 	// std::cout << "new target: " << target << "\n";
 	return _locations.find(target);
+}
+
+int	ws::Request::chunkRequest(void)
+{
+	std::string	newBody = this->_body;
+	std::string	bodyToRet;
+	int			contentLength = 0;
+	int			tempBody;
+	int			tempLength;
+	std::stringstream stream;
+
+
+	while ((tempBody = newBody.find("\r\n")))
+	{
+		if (atoi(newBody.substr(0, tempBody).c_str()) == 0)
+			break;
+		stream << newBody.substr(0, tempBody).c_str();
+		stream >> std::hex >> tempLength;
+		contentLength += tempLength;
+		newBody.erase(0, tempBody + 2);
+		tempBody = newBody.find("\r\n");
+		bodyToRet.append(newBody.substr(0, tempBody));
+		bodyToRet.append("\n");
+		contentLength += 1;
+		newBody.erase(0, tempBody + 2);
+	}
+	//delete the last \n of the body we don't need
+	bodyToRet.erase(bodyToRet.size() - 1, bodyToRet.size());
+	this->_body = bodyToRet;
+	return (contentLength);
 }
 
 // Setters

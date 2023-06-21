@@ -262,6 +262,7 @@ bool	ws::Server::_checkCgi(Request & req)
 {
 	if (req.getPath() == PATH_CGI_SCRIPT) return (true);
 	if (req.getPath() == PATH_UPLOAD_SCRIPT && req.getMethod() == "POST") return (true);
+	if (checkExtension(req.getPath(), ".py")) return (true);
 	return (false);
 }
 
