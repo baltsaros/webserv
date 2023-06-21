@@ -7,6 +7,8 @@ ws::Request::Request(const std::string &buffer, ConfigServer *config)
 	_locations = _config->getLocation();
 	_autoIndexFlag = false;
 	readBuffer();
+	// std::cout << "conf host: " << _config->getHost() << std::endl;
+	// std::cout << "req  host: " << _headerFields["Host"] << std::endl;
 	// std::cout << "header: " << _header << std::endl;
 	// std::cout << "body: " << _body << std::endl;
 	// std::cout << "method: " << _method << std::endl;
@@ -60,8 +62,9 @@ std::string	ws::Request::_getParam(std::string toGet, size_t offset) {
 }
 
 void	ws::Request::readBuffer() {
-	size_t	crlf = 0;
-	size_t	pos;
+	size_t		crlf = 0;
+	size_t		pos;
+	std::string	host;
 
 	// std::cout << "buffer: \n" << _buffer << std::endl;
 	// check until empty line that separates body from header
@@ -87,6 +90,11 @@ void	ws::Request::readBuffer() {
 		//std::cout << "PROTU\n";
 		int contentLength = chunkRequest();
 		this->_headerFields[CONTENT_LENGTH_FIELD] = contentLength;
+	}
+	host = ws::substrUntil(_headerFields["Host"], ':');
+	if (!host.size() || host.compare(_config->getHost())) {
+		_returnStatus = 400;
+		return ;
 	}
 	//if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
 	//	this->_returnStatus < 0 && this->_method == "POST")

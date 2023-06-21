@@ -62,3 +62,14 @@ std::string	ws::removeRootPath(const std::string &target, const std::string &roo
 		toReturn.erase(0, root.size());
 	return toReturn;
 }
+
+std::string	ws::substrUntil(std::string str, char separ) {
+	size_t		pos = str.find_first_of(separ);
+	std::string	toReturn;
+
+	if (pos != std::string::npos) {
+		toReturn = str.substr(0, pos);
+		return toReturn;
+	}
+	return "";
+}

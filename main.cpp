@@ -25,7 +25,7 @@ int	main(int argc, char **argv) {
 	// std::cout << "root /: " << locs["/"]->getRoot() << std::endl;
 
 	// config.getConfigServer()[0];
-	ws::Server  s1(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 32, *config);
+	ws::Server  s1(AF_INET, SOCK_STREAM, 0, INADDR_ANY, 64, *config);
 	s1.launcher();
 	delete config;
 	return (0);
