@@ -2,15 +2,12 @@
 
 import cgi, cgitb, os, sys
 
-form = cgi.FieldStorage()
-
-#print(os.environ["QUERY_STRING"], file=sys.stderr)
+sign = "+"
 error = False
+form = cgi.FieldStorage()
 number1 = int(form.getvalue('num1'))
 number2 = int(form.getvalue('num2'))
 operator = form.getvalue('operator')
-sign = "+"
-
 if operator == "plus":
 	result = number1 + number2
 elif operator == "minus":

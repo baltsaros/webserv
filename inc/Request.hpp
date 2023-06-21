@@ -67,5 +67,6 @@ class Request {
 		bool								getAutoIndexFlag() const;
 		std::string							getQueryString() const;
 		void								setPath(std::string & path);
+		int								chunkRequest();
 };
 }
