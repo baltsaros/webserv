@@ -111,7 +111,7 @@ int		ws::Server::_handler(int sockfd) {
 		Request req(_buf, _socketServer[sockfd]);
 		_req = req;
 	}
-	return 1;
+	return bytesRead;
 }
 
 // Send a response back
@@ -206,12 +206,12 @@ void	ws::Server::launcher() {
 					while (19) {
 						// receive all incoming data
 						ret = _handler(i);
-						if (!ret) {
+						if (ret <= 0) {
 							close_conn = true;
 							break ;
 						}
-						else if (ret == -1)
-							break ;
+						// else if (ret == -1)
+						// 	break ;
 						// send response back to the client
 						ret = _responder(i);
 						if (ret == -1) {

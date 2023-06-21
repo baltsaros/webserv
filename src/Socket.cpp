@@ -20,14 +20,14 @@ ws::Socket::Socket(int domain, int service, int protocol, std::vector<int> ports
 
 		// Creating endpoint for communication
 		sockfd = socket(domain, service, protocol);
-		test_connection(sockfd);
+		test_connection(sockfd, sockfd);
 		_backlog = backlog;
 		// Allow _sockfd to be reusable
 		ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char *)&on, sizeof(on));
-		test_connection(ret);
+		test_connection(ret, sockfd);
 		// Make the socket non blocking
 		ret = fcntl(sockfd, F_SETFL, O_NONBLOCK);
-		test_connection(ret);
+		test_connection(ret, sockfd);
 		connect_to_network(sockfd);
 		_sockfds.push_back(sockfd);
 	}
@@ -57,10 +57,10 @@ void	ws::Socket::connect_to_network(int sockfd) {
 
 	std::cout << "Binding" << std::endl;
 	ret = bind(sockfd, (struct sockaddr *)&_address, sizeof(_address));
-	test_connection(ret);
+	test_connection(ret, sockfd);
 	std::cout << "Listening" << std::endl;
 	ret = listen(sockfd, _backlog);
-	test_connection(ret);
+	test_connection(ret, sockfd);
 	_max_sd = sockfd;
 	// // Initialize set
 	// FD_ZERO(&_master_set);
@@ -71,9 +71,10 @@ void	ws::Socket::connect_to_network(int sockfd) {
 void	ws::Socket::setGeneration(int generation) {_generation = generation;}
 
 // Check for errors; socket, bind and listen return -1 on error and set errno to the appropriate value
-void	ws::Socket::test_connection(int to_test) {
+void	ws::Socket::test_connection(int to_test, int socket) {
 	if (to_test < 0) {
 		std::cerr << "Webserver error: " << strerror(to_test) << std::endl;
+		close(socket);
 		exit(EXIT_FAILURE);
 	}
 }
