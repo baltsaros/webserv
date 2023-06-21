@@ -106,6 +106,20 @@ int		ws::Server::_handler(int sockfd) {
 		else
 			return -1;
 	} while (bytesRead == BUFFER_SIZE - 1);
+	// plan B
+	// bytesRead = recv(sockfd, cbuf, BUFFER_SIZE - 1, MSG_DONTWAIT);
+	// if (bytesRead > 0) {
+	// 	cbuf[bytesRead] = '\0';
+	// 	_buf = cbuf;
+	// }
+	// // -1 means error; 0 - connection was closed by the client
+	// else if (bytesRead == 0) {
+	// 	std::cout << "Connection was closed" << std::endl;
+	// 	return 0;
+	// }
+	// else
+	// 	return -1;
+
 	if (_buf.size() > 0) {
 		// std::cout << _buf << std::endl;
 		Request req(_buf, _socketServer[sockfd]);
