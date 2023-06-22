@@ -6,13 +6,6 @@ ConfigLocation::ConfigLocation(std::string & content) {
 	this->_autoindex = 0;
 	parseLocation(content);
 	printMap(this->_errorPages);
-	// std::cout << "=============START LOCATION===============\n";
-	// std::cout << "root: " << this->_root << std::endl;
-	// std::cout << "index: " << this->_index << std::endl;
-	// std::cout << "autoindex in parser: " << this->_autoindex << std::endl;
-	// printVector(this->_methods);
-	// printMap(this->_return);
-	// std::cout << "==============END LOCATION================\n";
 }
 
 ConfigLocation::ConfigLocation(ConfigLocation const & src) {
@@ -133,16 +126,11 @@ void	ConfigLocation::parseLocation(std::string &content) {
 	std::list<std::pair<std::string, std::string> >	list;
 	
 	list = parseBlock(content);
-	// for (std::list<std::pair<std::string, std::string> >::iterator	it = list.begin(); it != list.end(); it++)
-	// 	std::cout << "First: " << (*it).first << ", second; " << (*it).second << std::endl;
 	for (std::list<std::pair<std::string, std::string> >::iterator	it = list.begin(); it != list.end(); it++) {
 		if (((*it).first).empty())
 			continue ;
 		dispatch(*it);
 	}
-	// for (int i = 1; i < this->_locationBlocks.size(); i++) {
-	// 	this->_vectLocations.push_back(ConfigLocation(this->_locationBlocks[i]));
-	// }
 }
 
 ConfigLocation & ConfigLocation::operator=(ConfigLocation const & rhs) {

@@ -21,7 +21,7 @@ void	printVector(std::vector<T> vector) {
 }
 
 std::list<std::pair<std::string, std::string> >	parseBlock(std::string &content);
-void	printMap(std::map<int, std::string> map);
-void	printMapStrings(std::map<std::string, std::string> map);
+void											printMap(std::map<int, std::string> map);
+void											printMapStrings(std::map<std::string, std::string> map);
 
 #endif

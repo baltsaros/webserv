@@ -39,7 +39,6 @@ class Socket {
 		std::vector<int>	getSockets() const;
 		int					getMaxsd() const;
 		int					getGeneration() const;
-		// fd_set				get_masterset() const;
 };
 
 }

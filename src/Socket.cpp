@@ -87,7 +87,3 @@ std::vector<int>	ws::Socket::getSockets() const {return _sockfds;}
 int	ws::Socket::getMaxsd() const {return _max_sd;}
 
 int	ws::Socket::getGeneration() const {return _generation;}
-
-// fd_set	ws::Socket::get_masterset() const {
-// 	return (_master_set);
-// }

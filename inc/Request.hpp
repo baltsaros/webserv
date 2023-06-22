@@ -11,7 +11,7 @@
 # define SPACE		" "
 # define NEWLINE	"\n"
 # define SLASH		"/"
-# define ASSETS	"/assets"
+# define ASSETS	"website/assets"
 # define CONTENT_LENGTH_FIELD "Content-Length"
 
 namespace ws {
@@ -38,7 +38,7 @@ class Request {
 		void									_parseStartingLine();
 		void									_parseHeaderFields();
 		void									_parseGetTarget();
-		std::map<std::string, ConfigLocation *>::iterator							_findLocation();
+		std::map<std::string, ConfigLocation *>::iterator		_findLocation();
 
 	public:
 		Request();
@@ -46,27 +46,27 @@ class Request {
 		Request(const Request &src);
 		~Request();
 
-		Request&	operator=(const Request &rhs);
-		void		readBuffer();
+		Request&								operator=(const Request &rhs);
+		void									readBuffer();
 
 		// setters
-		void								setReturnStatus(int code);
+		void									setReturnStatus(int code);
 
 		// getters
-		std::string							getBuffer() const;
-		std::string							getHeader() const;
-		std::string							getBody() const;
-		std::string							getMethod() const;
-		std::string							getTarget() const;
-		std::string							getProtocol() const;
-		std::map<std::string, std::string>	getHeaderFields() const;
-		ConfigServer*						getConfig() const;
-		std::string							getPath() const;
-		std::string							getResponse() const;
-		int									getReturnStatus() const;
-		bool								getAutoIndexFlag() const;
-		std::string							getQueryString() const;
-		void								setPath(std::string & path);
-		int								chunkRequest();
+		std::string								getBuffer() const;
+		std::string								getHeader() const;
+		std::string								getBody() const;
+		std::string								getMethod() const;
+		std::string								getTarget() const;
+		std::string								getProtocol() const;
+		std::map<std::string, std::string>		getHeaderFields() const;
+		ConfigServer*							getConfig() const;
+		std::string								getPath() const;
+		std::string								getResponse() const;
+		int										getReturnStatus() const;
+		bool									getAutoIndexFlag() const;
+		std::string								getQueryString() const;
+		void									setPath(std::string & path);
+		int										chunkRequest();
 };
 }

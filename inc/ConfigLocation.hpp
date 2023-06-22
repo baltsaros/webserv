@@ -31,12 +31,12 @@ class ConfigLocation {
 
 		ConfigLocation(void);
 
-		void	parseErrorPage(std::pair<std::string, std::string> &pair);
-		void	parseAutoIndex(std::pair<std::string, std::string> &pair);
-		void	parseMethods(std::pair<std::string, std::string> &pair);
-		void	parseReturn(std::pair<std::string, std::string> &pair);
-		void	dispatch(std::pair<std::string, std::string> &pair);
-		void	parseLocation(std::string &content);
+		void						parseErrorPage(std::pair<std::string, std::string> &pair);
+		void						parseAutoIndex(std::pair<std::string, std::string> &pair);
+		void						parseMethods(std::pair<std::string, std::string> &pair);
+		void						parseReturn(std::pair<std::string, std::string> &pair);
+		void						dispatch(std::pair<std::string, std::string> &pair);
+		void						parseLocation(std::string &content);
 
 	public:
 		ConfigLocation(std::string & content);
@@ -45,8 +45,8 @@ class ConfigLocation {
 
 		ConfigLocation	& operator=(ConfigLocation const & rhs);
 
-		void	setRoot(std::string &root);
-		void	setIndex(std::string &index);
+		void						setRoot(std::string &root);
+		void						setIndex(std::string &index);
 
 		std::map<int, std::string>	getErrorPages(void) const;
 		std::string					getRoot(void) const;

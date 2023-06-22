@@ -4,14 +4,6 @@ ConfigServer::ConfigServer(std::string & content) {
 
 	createServerBlocks(content);
 	parseServer();
-	// std::cout << "=============START SERVER===============\n";
-	// printVector(this->_ports);
-	// std::cout << this->_host << "\n";
-	// printVector(this->_serverNames);
-	// std::cout << this->_clientMaxBodySize << "\n";
-	// printMap(this->_errorPages);
-	// std::cout << "==============END SERVER================\n";
-	// std::cout << "location map size: " << this->_mapLocations.size() << std::endl;
 }
 
 ConfigServer::ConfigServer(ConfigServer const & src) {
@@ -48,11 +40,6 @@ void	ConfigServer::createServerBlocks(std::string & content) {
 		else 
 			break ;
 	}
-// 	for (int i = 0; i < this->_serverBlocks.size(); i++) {
-// 		std::cout << this->_serverBlocks[i];
-// 		std::cout << "\n=====================\n";
-// 		// std::cout << "end i: " << i << "\n";
-// 	}
 }
 
 /*
@@ -241,8 +228,6 @@ void	ConfigServer::parseServer() {
 	std::string										locPath;
 	
 	list = parseBlock(this->_serverBlocks[0]);
-	// for (std::list<std::pair<std::string, std::string> >::iterator	it = list.begin(); it != list.end(); it++)
-	// 	std::cout << "First: " << (*it).first << ", second; " << (*it).second << std::endl;
 	for (std::list<std::pair<std::string, std::string> >::iterator	it = list.begin(); it != list.end(); it++) {
 		if (((*it).first).empty())
 			continue ;
@@ -250,9 +235,7 @@ void	ConfigServer::parseServer() {
 	}
 	for (int i = 1; i < this->_serverBlocks.size(); i++) {
 		locPath = extractLocPath(this->_serverBlocks[i]);
-		// std::cout << "locPath " << i << ": " << locPath << "\n";
 		this->_mapLocations[locPath] = new ConfigLocation(this->_serverBlocks[i]);
-		// this->_vectLocations.push_back(new ConfigLocation(this->_serverBlocks[i]));
 	}
 }
 

@@ -96,8 +96,6 @@ std::string	ws::Response::createAutoIndex() {
 	DIR					*dir;
 	struct dirent		*entry;
 
-	 std::cout << "target in response: " << target << std::endl;
-	 std::cout << "path in response: " << path << std::endl;
 	buf << "<!DOCTYPE html>\n";
 	buf << "<html lang=\"en\">\n";
 	buf << "<head><title>AutoIndex for " << path << "</title></head>\n";

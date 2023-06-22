@@ -1,9 +1,9 @@
 .logo
-			{
-				display: block;
-				font-size: 200px;
-				text-align: center;
-			}
+{
+	display: block;
+	font-size: 200px;
+	text-align: center;
+}
 
 .navbar
 {
@@ -62,6 +62,16 @@ li a:hover
 .body-style
 {
 	background-color: #99FFCC;
+}
+
+.body-style-bis
+{
+	background-color: #ff0000;
+}
+
+.body-style-ter
+{
+	background-color: #99FFFF;
 }
 
 input

@@ -107,7 +107,6 @@ int		ws::Server::_handler(int sockfd) {
 			return -1;
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
-		// std::cout << _buf << std::endl;
 		Request req(_buf, _socketServer[sockfd]);
 		_req = req;
 	}
