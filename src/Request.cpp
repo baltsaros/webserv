@@ -153,6 +153,7 @@ void	ws::Request::_checkPath() {
 			_returnStatus = 404;
 	}
 	else {
+		// std::cout << "autoindex: " << tmp->second->getAutoIndex() << "\n";
 		if (tmp->second->getAutoIndex())
 			_autoIndexFlag = true;
 		else
