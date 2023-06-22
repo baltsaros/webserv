@@ -7,14 +7,6 @@ ws::Request::Request(const std::string &buffer, ConfigServer *config)
 	_locations = _config->getLocation();
 	_autoIndexFlag = false;
 	readBuffer();
-	// std::cout << "header: " << _header << std::endl;
-	// std::cout << "body: " << _body << std::endl;
-	// std::cout << "method: " << _method << std::endl;
-	// std::cout << "target: " << _target << std::endl;
-	// std::cout << "protocol: " << _protocolVersion << std::endl;
-	// std::cout << "Headerfields:\n";
-	// printMapStrings(_headerFields);
-	// std::cout << std::endl;
 }
 
 ws::Request::Request(Request const &src) {
@@ -60,10 +52,10 @@ std::string	ws::Request::_getParam(std::string toGet, size_t offset) {
 }
 
 void	ws::Request::readBuffer() {
-	size_t	crlf = 0;
-	size_t	pos;
+	size_t		crlf = 0;
+	size_t		pos;
+	std::string	host;
 
-	// std::cout << "buffer: \n" << _buffer << std::endl;
 	// check until empty line that separates body from header
 	crlf = _buffer.find("\r\n\r\n");
 	if (crlf == std::string::npos || !_buffer.size()) {
@@ -81,8 +73,20 @@ void	ws::Request::readBuffer() {
 	_parseStartingLine();
 	_parseHeaderFields();
 	_body = _buffer.substr(crlf + 4);
-	if (this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0 &&
-		this->_returnStatus < 0 && this->_method == "POST")
+	if (this->_headerFields.count("Transfer-Encoding") && 
+		this->_headerFields["Transfer-Encoding"] == "chunked\r")
+	{
+		int contentLength = chunkRequest();
+		this->_headerFields[CONTENT_LENGTH_FIELD] = contentLength;
+	}
+	host = ws::substrUntil(_headerFields["Host"], ':');
+	if (!host.size() || host.compare(_config->getHost())) {
+		_returnStatus = 400;
+		return ;
+	}
+	if (this->_returnStatus < 0 && this->_method == "POST"
+		&& this->_headerFields.count(CONTENT_LENGTH_FIELD) == 0
+		&& this->_headerFields.count("Transfer-Encoding") == 0)
 	{
 		std::cerr << "Content length is missing with request POST\n";
 		this->_returnStatus = 411;
@@ -95,14 +99,15 @@ void	ws::Request::readBuffer() {
 		this->_returnStatus = 413;
 		return ;
 	}
-	if (this->_returnStatus < 0 && this->_method == "POST" &&
-		this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
+	if (this->_returnStatus < 0 && this->_method == "POST"
+		&& this->_headerFields.count("Transfer-Encoding") == 0
+		&& this->_headerFields.count(CONTENT_LENGTH_FIELD)
+		&& this->_body.size() != atof(this->_headerFields[CONTENT_LENGTH_FIELD].c_str()))
 		{
 			std::cerr << "Body size doesn't match content length\n";
 			this->_returnStatus = 501;
 			return ;
 		}
-	// std::cout << "body: " << _body << "|\n";
 	// get parameters from the starting line: method, taget and protocol version
 }
 
@@ -113,8 +118,6 @@ void	ws::Request::_checkPath() {
 
 	tmp = _findLocation();
 	target = _target;
-	// std::cout << "key: " << tmp->first << "\n";
-	// std::cout << "target: " << _target << "\n";
 	_autoIndexFlag = false;
 	_returnStatus = -1;
 	if (!_checkMethod(tmp->second->getMethods())) {
@@ -129,7 +132,6 @@ void	ws::Request::_checkPath() {
 		target.erase(0, tmp->first.size());
 	}
 	_path = tmp->second->getRoot() + target;
-	std::cout << "path: " << _path << "\n";
 	ws::trimTrailingChar(_path, '/');
 	if (!isDirectory(_path)) {
 		if (ws::checkNoExtension(_path))
@@ -143,63 +145,7 @@ void	ws::Request::_checkPath() {
 		else
 			_path += SLASH + tmp->second->getIndex();
 	}
-	// std::cout << "autoindex: " << _autoIndexFlag << "\n";
-	// std::cout << "return status: " << _returnStatus << "\n";
 }
-
-// void	ws::Request::_checkPath() {
-// 	std::map<std::string, ConfigLocation *>::iterator	tmp;
-// 	std::map<std::string, ConfigLocation *>::iterator	it = _locations.begin();
-// 	std::map<std::string, ConfigLocation *>::iterator	itEnd = _locations.end();
-// 	bool	aiFlag = false;
-// 	bool	findLocation = false;
-
-// 	tmp = _locations.find(_target);
-// 	// tmp = _findLocation();
-// 	// std::cout << "key: " << tmp->first << "\n";
-// 	do {
-// 		_autoIndexFlag = false;
-// 		_returnStatus = -1;
-// 		// searching for a proper location to create path;
-// 		// if target and location name are the same, then go to condition 2
-// 		// in order to have proper autoindex and methods
-// 		// std::cout << "name: " << it->first << std::endl;
-// 		// std::cout << "target: " << _target << std::endl;
-// 		if (!_target.compare("/"))
-// 			_path = it->second->getRoot() + "/" + it->second->getIndex();
-// 		else if (tmp != itEnd && tmp->second->getRoot().size()) {
-// 			it = tmp;
-// 			trimTrailingChar(_target, '/');
-// 			_path = it->second->getRoot();
-// 		}
-// 		else {
-// 			trimTrailingChar(_target, '/');
-// 			_path = it->second->getRoot() + _target;
-// 		}
-// 		aiFlag = it->second->getAutoIndex();
-// 		// std::cout << "flag: " << aiFlag << std::endl;
-// 		// check if directory exists or not; otherwise append ".html"
-// 		if (aiFlag && isDirectory(_path))
-// 			_autoIndexFlag = true;
-// 		else if (ws::checkNoExtension(_path))
-// 			_path += ".html";
-// 		// std::cout << "path: " << _path << std::endl;
-// 		// std::cout << "exist: " << fileExists(_path) << std::endl;
-// 		// if file at _path does not exist, return error 404
-// 		if (ws::fileExists(_path)) {
-// 			findLocation = true;
-// 			if (!_checkMethod(it->second->getMethods())) {
-// 				_returnStatus = 405;
-// 				break ;
-// 			}
-// 		}
-// 		++it;
-// 		if (it == itEnd && !findLocation) {
-// 			findLocation = true;
-// 			_returnStatus = 404;
-// 		}
-// 	} while (findLocation != true);
-// }
 
 bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
 	std::vector<std::string>::iterator	it = methods.begin();
@@ -250,8 +196,6 @@ void	ws::Request::_parseHeaderFields() {
 	pos = pos + 2;
 	// content is a trim of _header without the first line
 	std::string	content = _header.substr(pos);
-	// std::cout << "content:\n" << content;
-	// std::cout << "\n=============\n";
 	pos = 0;
 	// puts the lefthand side of ":" into the key of the map and the righthand side into the value of the map
 	while (pos != std::string::npos) {
@@ -264,7 +208,6 @@ void	ws::Request::_parseHeaderFields() {
 			pair.first = content.substr(pos, pos1);
 		else
 			pair.first = content.substr(pos + 1, pos1 - pos - 1);
-		// std::cout << "first: " << pair.first << std::endl;
 		pos2 = content.find(SPACE, pos1);
 		if (pos2 == std::string::npos) {
 			_returnStatus = 400;
@@ -272,7 +215,6 @@ void	ws::Request::_parseHeaderFields() {
 		}
 		pos = content.find(NEWLINE, pos2);
 		pair.second = content.substr(pos2 + 1, pos - pos2 - 1);
-		// std::cout << "second: " << pair.second << std::endl;
 		this->_headerFields.insert(pair);
 	}
 }
@@ -290,19 +232,46 @@ void	ws::Request::_parseGetTarget(void)
 std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
 
 	std::string	target;
-	// ConfigLocation	*tmp;
 	int			pos = 42;
 	
 	target = _target;
-	// tmp = _locations.find(target);
 	while (pos != 0 && _locations[target] == NULL) {
 		pos = target.find_last_of('/');
 		target = target.substr(0, pos);
 	}
 	if (pos == 0)
 		target = "/";
-	// std::cout << "new target: " << target << "\n";
 	return _locations.find(target);
+}
+
+int	ws::Request::chunkRequest(void)
+{
+	std::string	newBody = this->_body;
+	std::string	bodyToRet;
+	int			contentLength = 0;
+	int			tempBody;
+	int			tempLength;
+	std::stringstream stream;
+
+
+	while ((tempBody = newBody.find("\r\n")))
+	{
+		if (atoi(newBody.substr(0, tempBody).c_str()) == 0)
+			break;
+		stream << newBody.substr(0, tempBody).c_str();
+		stream >> std::hex >> tempLength;
+		contentLength += tempLength;
+		newBody.erase(0, tempBody + 2);
+		tempBody = newBody.find("\r\n");
+		bodyToRet.append(newBody.substr(0, tempBody));
+		bodyToRet.append("\n");
+		contentLength += 1;
+		newBody.erase(0, tempBody + 2);
+	}
+	//delete the last \n of the body we don't need
+	bodyToRet.erase(bodyToRet.size() - 1, bodyToRet.size());
+	this->_body = bodyToRet;
+	return (contentLength);
 }
 
 // Setters

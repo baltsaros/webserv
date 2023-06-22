@@ -107,11 +107,10 @@ int		ws::Server::_handler(int sockfd) {
 			return -1;
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
-		// std::cout << _buf << std::endl;
 		Request req(_buf, _socketServer[sockfd]);
 		_req = req;
 	}
-	return 1;
+	return bytesRead;
 }
 
 // Send a response back
@@ -206,12 +205,12 @@ void	ws::Server::launcher() {
 					while (19) {
 						// receive all incoming data
 						ret = _handler(i);
-						if (!ret) {
+						if (ret <= 0) {
 							close_conn = true;
 							break ;
 						}
-						else if (ret == -1)
-							break ;
+						// else if (ret == -1)
+						// 	break ;
 						// send response back to the client
 						ret = _responder(i);
 						if (ret == -1) {
@@ -262,6 +261,7 @@ bool	ws::Server::_checkCgi(Request & req)
 {
 	if (req.getPath() == PATH_CGI_SCRIPT) return (true);
 	if (req.getPath() == PATH_UPLOAD_SCRIPT && req.getMethod() == "POST") return (true);
+	if (checkExtension(req.getPath(), ".py")) return (true);
 	return (false);
 }
 

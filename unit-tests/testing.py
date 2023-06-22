@@ -56,7 +56,7 @@ def test_several_ports():
 	assert response.text == expected_content
 
 def test_several_servers():
-	url2 = "http://localhost:9997/index"
+	url2 = "http://127.0.0.1:9997/index"
 	response = requests.get(url)
 	assert response.status_code == 200
 	with open("../website/html/index.html") as file:

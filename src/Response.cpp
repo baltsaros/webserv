@@ -70,6 +70,9 @@ void	ws::Response::checkRequest() {
 		case 413:
 			_response = "HTTP/1.1 413 Content Too Large\r\n";
 			break;
+		case 500:
+			_response = "HTTP/1.1 500 Internal Server Error\r\n";
+			break;
 		case 501:
 			_response = "HTTP/1.1 501 Not Implemented\r\n";
 			break;
@@ -93,14 +96,11 @@ std::string	ws::Response::createAutoIndex() {
 	DIR					*dir;
 	struct dirent		*entry;
 
-	 std::cout << "target in response: " << target << std::endl;
-	 std::cout << "path in response: " << path << std::endl;
 	buf << "<!DOCTYPE html>\n";
 	buf << "<html lang=\"en\">\n";
 	buf << "<head><title>AutoIndex for " << path << "</title></head>\n";
 	buf << "<body>\n";
 	buf << "<ul>\n";
-	// buf << "<h1>\n";
 	dir = opendir(path.c_str());
 	if (!dir) {
 		std::cerr << "Could not open the directory" << std::endl;
@@ -123,7 +123,6 @@ std::string	ws::Response::createAutoIndex() {
 		}
 	}
 	closedir(dir);
-	// buf << "</h1>\n";
 	buf << "</ul>\n";
 	buf << "</body>\n";
 	buf << "</html>\n";

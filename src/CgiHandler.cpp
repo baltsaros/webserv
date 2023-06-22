@@ -143,6 +143,7 @@ int	ws::CgiHandler::execute(void)
 	}
 	else
 	{
+		int retPid;
 		int ret;
 		close(pipe_in[0]);
 		close(pipe_out[1]);
@@ -163,7 +164,14 @@ int	ws::CgiHandler::execute(void)
 			status = send(this->_socketFd, toRet.c_str(), toRet.size(), 0);
 		}
 		close(pipe_out[0]);
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &retPid, 0);
+		if (WIFEXITED(retPid) ) {
+			int es = WEXITSTATUS(retPid);
+			this->_req.setReturnStatus(500);
+			Response rep = Response(_req);
+			std::string toSend = rep.getResponse();
+			status = send(this->_socketFd, toSend.c_str(), toSend.size(), 0);
+		}
 	}
 	return status;
 }

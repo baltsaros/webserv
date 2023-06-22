@@ -29,8 +29,6 @@ std::list<std::pair<std::string, std::string> >	parseBlock(std::string &content)
 		pair.second = buffer.substr(pos1 + 1, pos2 - pos1 - 1);
 		list.push_back(pair);
 	}
-	// for (std::list<std::pair<std::string, std::string> >::iterator it = list.begin(); it != list.end(); it++)
-	// 	std::cout << "First: " << (*it).first << ", second; " << (*it).second << std::endl;
 	return (list);
 }
 
@@ -53,14 +51,3 @@ void	printMapStrings(std::map<std::string, std::string> map) {
 		it++;
 	}
 }
-
-/*
-int main() {
-
-	// std::string content = "server {\n\tlisten 80;\t\t\t\t\t	# listening port (mandatory parameter) / if left blank, it will be 0.0.0.0:80\n\thost 127.0.0.1;\t\t\t\t\t# host\n\tserver_name plop;\t\t\t # server name / could be empty\n\tclient_max_body_size 1024;\t\t# max request body size in bytes\n\n\terror_page 404 /error/404.html;\t# default error page\n\n";
-	std::string content = "\tlocation / {\n\t\troot /tmp/server_eval;\n\t\tindex index.html;\n\t}";
-	
-	parseBlock(content);
-	return (0);
-}
-*/

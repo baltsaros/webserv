@@ -8,6 +8,7 @@
 # include <map>
 # include <sys/socket.h>
 # include <sys/wait.h>
+# include "Response.hpp"
 
 # define CONTENT_TYPE "CONTENT_TYPE"
 # define CONTENT_LENGTH "CONTENT_LENGTH"
@@ -36,8 +37,9 @@ class CgiHandler
 		std::map<std::string, std::string>	_envVariables;
 		int									_socketFd;
 
-		void initializeEnv(void);
-		std::string	createEnvString(std::string leftString, std::string righString);
+		void								initializeEnv(void);
+		std::string							createEnvString(std::string leftString, std::string righString);
+		
 		CgiHandler();
 
 	public:

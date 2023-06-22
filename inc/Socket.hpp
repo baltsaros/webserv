@@ -7,6 +7,7 @@
 # include <vector>
 # include <fcntl.h>
 # include <iostream>
+# include <unistd.h>
 
 namespace	ws {
 
@@ -28,7 +29,7 @@ class Socket {
 
 		Socket&				operator=(const Socket &rhs);
 		void				connect_to_network(int sockfd);
-		void				test_connection(int to_test);
+		void				test_connection(int to_test, int socket);
 
 		// setters
 		void				setGeneration(int generation);
@@ -38,7 +39,6 @@ class Socket {
 		std::vector<int>	getSockets() const;
 		int					getMaxsd() const;
 		int					getGeneration() const;
-		// fd_set				get_masterset() const;
 };
 
 }

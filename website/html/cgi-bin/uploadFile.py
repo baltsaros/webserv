@@ -63,7 +63,7 @@ if  fileItem.filename:
 	message = 'The file "' + fn + '" was uploaded successfully'
 	count = len(temp) + len(message) + len(end)
 else:
-	message = 'No file was uploaed'
+	message = 'No file was uploaded'
 	count = len(temp) + len(message) + len(end)
 
 print ("HTTP/1.1 200 OK")
