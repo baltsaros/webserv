@@ -124,11 +124,7 @@ void	ws::Request::_checkPath() {
 		_returnStatus = 405;
 		return ;
 	}
-	if (!tmp->first.compare(ASSETS)) {
-		_path = tmp->second->getRoot() + _target;
-		return ;
-	}
-	if (tmp->first.compare(ASSETS) && tmp->first.compare(SLASH)) {
+	if (tmp->first.compare(SLASH)) {
 		target.erase(0, tmp->first.size());
 	}
 	_path = tmp->second->getRoot() + target;
@@ -179,7 +175,12 @@ void	ws::Request::_parseStartingLine() {
 	_target = _header.substr(start, pos - start);
 	_queryString = _target;
 	_parseGetTarget();
-	_checkPath();
+	if (checkExtension(_target, ".css") || checkExtension(_target, ".ico")) {
+		_path = "website" + _target;
+		_returnStatus = -1;
+	}
+	else
+		_checkPath();
 	start = pos + 1;
 	pos = _header.find("\r\n", start);
 	_protocolVersion = _header.substr(start, pos - start);

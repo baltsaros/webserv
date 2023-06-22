@@ -1,18 +1,10 @@
 #!/usr/bin/python3
 
-import cgi, os
-import cgitb
-
-cgitb.enable()
+import cgi, os, sys
 
 form = cgi.FieldStorage()
 
-fileItem = form['filename']
 path = "website/html/upload_files/"
-isExist = os.path.exists(path)
-
-if not isExist:
-	os.makedirs(path)
 
 temp = """
 	<!DOCTYPE html>
@@ -55,13 +47,20 @@ end = """
 	</footer>
 	</html>
 """
-
-if  fileItem.filename:
-	fn = os.path.basename(fileItem.filename)
-	dest_path = os.path.join(path, fn)
-	open(path + fn, 'wb').write(fileItem.file.read())
-	message = 'The file "' + fn + '" was uploaded successfully'
-	count = len(temp) + len(message) + len(end)
+if "filename" in form:
+	fileItem = form['filename']
+	isExist = os.path.exists(path)
+	if not isExist:
+		os.makedirs(path)
+	if  fileItem.filename:
+		fn = os.path.basename(fileItem.filename)
+		dest_path = os.path.join(path, fn)
+		open(path + fn, 'wb').write(fileItem.file.read())
+		message = 'The file "' + fn + '" was uploaded successfully'
+		count = len(temp) + len(message) + len(end)
+	else:
+		message = 'No file was uploaded'
+		count = len(temp) + len(message) + len(end)
 else:
 	message = 'No file was uploaded'
 	count = len(temp) + len(message) + len(end)

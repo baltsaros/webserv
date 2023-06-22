@@ -119,16 +119,16 @@ int		ws::Server::_responder(int sockfd) {
 	Response	response(_req);
 	std::string	toSend;
 
-	if (this->_req.getMethod() == "DELETE")
-	{
-		ret = this->_deleteFile(this->_req, sockfd);
-	}
-	else if (_req.getReturnStatus() >= 0)
+	if (_req.getReturnStatus() >= 0)
 	{
 		toSend = response.getResponse();
 		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
 	}
-	else if (_checkCgi(this->_req) && !(this->_req.getReturnStatus() >= 0))
+	else if (this->_req.getMethod() == "DELETE")
+	{
+		ret = this->_deleteFile(this->_req, sockfd);
+	}
+	else if (_checkCgi(this->_req))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		ret = cgi.execute();
