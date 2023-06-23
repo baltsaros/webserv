@@ -1,13 +1,11 @@
-# to install pytest: sudo pip3 install pytest
-# need to create venv: python3 -m venv env
-# then activate it: source env/bin/activate
+# in order to be able to run these tests on school computers, install python3: brew install python3
+# install pytest: pip3 install pytest
+# install dependencies: pip3 install requests bs4
+# create venv: python3 -m venv env
+# activate it: source env/bin/activate
 # to run: pytest testing.py
-# might also need to install requests module: pip3 install requests
-# and pip3 install httpx
-# on school computers i also had to install with brew: brew install httpx
 
 import unittest
-# import httpx
 import requests
 import os
 from bs4 import BeautifulSoup
@@ -149,13 +147,3 @@ def test_autoindex_off():
 	clean_text = remove_html_tags(response.text)
 	assert response.status_code == 200
 	assert response.text == expected_content
-
-
-# def test_http2_request():
-# 	with httpx.Client(http2=True) as client:
-# 		response = client.get(url)
-# 	with open("../website/html/error_pages/400.html") as file:
-# 		expected_content = file.read()
-# 	assert response.status_code == 400
-# 	assert response.text == expected_content
-	
