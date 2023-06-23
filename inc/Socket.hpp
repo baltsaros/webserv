@@ -18,7 +18,6 @@ class Socket {
 		int					_backlog;
 		int					_generation;
 		struct sockaddr_in	_address;
-		// fd_set				_master_set;
 
 	public:
 		Socket();

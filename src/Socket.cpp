@@ -16,7 +16,6 @@ ws::Socket::Socket(int domain, int service, int protocol, std::vector<int> ports
 		_address.sin_family = domain;
 		_address.sin_port = htons(*it);
 		_address.sin_addr.s_addr = htonl(interface);
-		// _address.sin_addr.s_addr = INADDR_ANY;
 
 		// Creating endpoint for communication
 		sockfd = socket(domain, service, protocol);
@@ -55,17 +54,13 @@ ws::Socket&	ws::Socket::operator=(Socket const &rhs) {
 void	ws::Socket::connect_to_network(int sockfd) {
 	int	ret = 0;
 
-	std::cout << "Binding" << std::endl;
+	// std::cout << "Binding" << std::endl;
 	ret = bind(sockfd, (struct sockaddr *)&_address, sizeof(_address));
 	test_connection(ret, sockfd);
-	std::cout << "Listening" << std::endl;
+	// std::cout << "Listening" << std::endl;
 	ret = listen(sockfd, _backlog);
 	test_connection(ret, sockfd);
 	_max_sd = sockfd;
-	// // Initialize set
-	// FD_ZERO(&_master_set);
-	// // Add a new socket to the set
-	// FD_SET(_sockfd, &_master_set);
 }
 
 void	ws::Socket::setGeneration(int generation) {_generation = generation;}

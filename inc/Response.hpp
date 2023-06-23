@@ -17,7 +17,7 @@ class Response {
 		Response(const Response &src);
 		~Response();
 
-		Response&	operator=(const Response &rhs);
+		Response&		operator=(const Response &rhs);
 		void			createResponse();
 		void			checkRequest();
 		std::string		createAutoIndex();

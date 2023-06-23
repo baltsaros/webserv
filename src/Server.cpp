@@ -32,7 +32,6 @@ ws::Server::Server(int domain, int service, int protocol,
 		FD_SET((*it), &_master_set);
 	// Set timeout time for select; 3 mins in out case;
 	_timeout.tv_sec = 3 * 60;
-	// _timeout.tv_sec = 5;
 	_timeout.tv_usec = 0;
 }
 
@@ -72,7 +71,7 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 // Accept a connection on our socket and creates a new socket ft that is linked to the original one
 // Receive a message from the socket _sockfd
 int		ws::Server::_accepter(int sockfd) {
-	std::cout << "Accepting" << std::endl;
+	// std::cout << "Accepting" << std::endl;
 	// error check for nonexisten _socket[sockfd]?
 	struct sockaddr_in	address = _socket[sockfd]->getAddress();
 	int	new_sd;
@@ -86,7 +85,7 @@ int		ws::Server::_accepter(int sockfd) {
 
 // Print the received message
 int		ws::Server::_handler(int sockfd) {
-	std::cout << "Reading" << std::endl;
+	// std::cout << "Reading" << std::endl;
 	_buf.clear();
 	char	cbuf[BUFFER_SIZE];
 	ssize_t	bytesRead;
@@ -169,7 +168,7 @@ void	ws::Server::launcher() {
 			break ;
 		}
 		sds_ready = ret;
-		std::cout << "==== WAITING ====" << std::endl;
+		// std::cout << "==== WAITING ====" << std::endl;
 		for (int i = 0; i <= _max_sd && sds_ready > 0; ++i) {
 			// Check what descriptor (socket) is ready for connection
 			if (FD_ISSET(i, &_working_set)) {
@@ -188,8 +187,8 @@ void	ws::Server::launcher() {
 							}
 							break ;
 						}
-						std::cout << "max socket: " << _max_sd << std::endl;
-						std::cout << "server socket: " << new_sd << std::endl;
+						// std::cout << "max socket: " << _max_sd << std::endl;
+						// std::cout << "server socket: " << new_sd << std::endl;
 						// adding the new incoming connection to the master set
 						FD_SET(new_sd, &_master_set);
 						if (new_sd > _max_sd)
@@ -209,8 +208,6 @@ void	ws::Server::launcher() {
 							close_conn = true;
 							break ;
 						}
-						// else if (ret == -1)
-						// 	break ;
 						// send response back to the client
 						ret = _responder(i);
 						if (ret == -1) {
@@ -234,9 +231,9 @@ void	ws::Server::launcher() {
 				} // else
 			} // FD_ISSET
 		} // for loop to check every descriptor
-		std::cout << "==== DONE ====" << std::endl;
+		// std::cout << "==== DONE ====" << std::endl;
 	} // main loop begins
-	std::cout << "Closing fds" << std::endl;
+	// std::cout << "Closing fds" << std::endl;
 	for (int i = 0; i <= _max_sd; ++i) {
 		if (FD_ISSET(i, &_master_set))
 			close(i);

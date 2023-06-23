@@ -64,7 +64,7 @@ bool	ws::isDirectory(const std::string &path) {
 }
 
 /*
-** Remove the last character if found.
+** Remove all trail chars at the end.
 ** @param std::string & str : The string to trim
 ** @param char trail : The char to remove
 ** @return No return
