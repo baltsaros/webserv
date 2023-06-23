@@ -15,7 +15,6 @@ Configuration::Configuration(Configuration const & src) {
 	*this = src;
 }
 Configuration::~Configuration() {
-	
 	this->_vectServers.clear();
 }
 
