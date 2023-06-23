@@ -17,14 +17,14 @@ class Response {
 		Response(const Response &src);
 		~Response();
 
-		Response&	operator=(const Response &rhs);
-		void		createResponse();
-		void		checkRequest();
-		std::string	createAutoIndex();
+		Response&		operator=(const Response &rhs);
+		void			createResponse();
+		void			checkRequest();
+		std::string		createAutoIndex();
 
-		std::string	getMsg() const;
-		std::string	getResponse() const;
-		int			getRet() const;
-		ws::Request	getRequest() const;
+		std::string		getMsg() const;
+		std::string		getResponse() const;
+		int				getRet() const;
+		ws::Request		getRequest() const;
 };
 }

@@ -9,13 +9,27 @@
 		str.erase(pos + 1);
 	}
 
-int main()
+// map::count
+#include <iostream>
+#include <map>
+
+int main ()
 {
-	std::string str = "test/index/";
-	trimTrailingChar(str, '/');
-	std::string str2 = "test/index";
-	trimTrailingChar(str2, '/');
-	std::cout << "first " << str << "\n";
-	std::cout << "second " << str2 << "\n";
-	return (0);
+  std::map<char,int> mymap;
+  char c;
+
+  mymap ['a'];
+  mymap ['c']=202;
+  mymap ['f']=303;
+
+  for (c='a'; c<'h'; c++)
+  {
+    std::cout << c;
+    if (mymap.count(c)>0)
+      std::cout << " is an element of mymap.\n";
+    else 
+      std::cout << " is not an element of mymap.\n";
+  }
+
+  return 0;
 }

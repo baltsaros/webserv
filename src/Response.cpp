@@ -2,6 +2,7 @@
 
 ws::Response::Response() {}
 
+// Constructor takes a request as its parameter
 ws::Response::Response(const Request &req) :
 		_req(req) {createResponse();}
 
@@ -19,6 +20,7 @@ ws::Response&	ws::Response::operator=(const Response &rhs) {
 	return *this;
 }
 
+// Check error status and create a proper response message, including header and body
 void	ws::Response::createResponse() {
 	if (_req.getReturnStatus() >= 0)
 		checkRequest();
@@ -46,7 +48,7 @@ void	ws::Response::createResponse() {
 	}
 }
 
-// check for an error code and create an according response
+// Check for an error code and create an according error response
 void	ws::Response::checkRequest() {
 	int	returnStatus = _req.getReturnStatus();
 	std::map<int, std::string>	errorPath = _req.getConfig()->getErrorPages();
@@ -64,9 +66,9 @@ void	ws::Response::checkRequest() {
 		case 405:
 			_response = "HTTP/1.1 405 Method Not Allowed\r\n";
 			break;
-		//case 411:
-		//	_response = "HTTP/1.1 411 Length Required\r\n";
-		//	break;
+		case 411:
+			_response = "HTTP/1.1 411 Length Required\r\n";
+			break;
 		case 413:
 			_response = "HTTP/1.1 413 Content Too Large\r\n";
 			break;
@@ -89,6 +91,7 @@ void	ws::Response::checkRequest() {
 	_response += _msg;
 }
 
+// Create a response for autoindex page with hyperlinks
 std::string	ws::Response::createAutoIndex() {
 	std::string			path = _req.getPath();
 	std::string			target = _req.getTarget();
@@ -96,8 +99,6 @@ std::string	ws::Response::createAutoIndex() {
 	DIR					*dir;
 	struct dirent		*entry;
 
-	 std::cout << "target in response: " << target << std::endl;
-	 std::cout << "path in response: " << path << std::endl;
 	buf << "<!DOCTYPE html>\n";
 	buf << "<html lang=\"en\">\n";
 	buf << "<head><title>AutoIndex for " << path << "</title></head>\n";

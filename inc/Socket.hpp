@@ -18,7 +18,6 @@ class Socket {
 		int					_backlog;
 		int					_generation;
 		struct sockaddr_in	_address;
-		// fd_set				_master_set;
 
 	public:
 		Socket();
@@ -39,7 +38,6 @@ class Socket {
 		std::vector<int>	getSockets() const;
 		int					getMaxsd() const;
 		int					getGeneration() const;
-		// fd_set				get_masterset() const;
 };
 
 }

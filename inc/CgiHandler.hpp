@@ -37,8 +37,9 @@ class CgiHandler
 		std::map<std::string, std::string>	_envVariables;
 		int									_socketFd;
 
-		void initializeEnv(void);
-		std::string	createEnvString(std::string leftString, std::string righString);
+		void								initializeEnv(void);
+		std::string							createEnvString(std::string leftString, std::string righString);
+		
 		CgiHandler();
 
 	public:

@@ -3,6 +3,15 @@
 // Constructors
 ws::Server::Server() {}
 
+// constructor takes the following parameters:
+// domain - what address family we use (IPv4 or IPv6 for example)
+// service - what socket type we use (SOCK_STREAM means two way connections, TCP socket)
+// protocol - what protocol to use with the socket; 0 is default value
+// interface - what IP addresses the socket should listen to; INADDR_ANY listens to all
+// IPv4 addresses, value is 0.0.0.0
+// backlog - specifies the maximum number of clients
+// that can be waiting to be served while the server is handling other connections
+// config - config parameters
 ws::Server::Server(int domain, int service, int protocol,
 					u_long interface, int backlog,
 					Configuration config) : _config(config) {
@@ -32,7 +41,6 @@ ws::Server::Server(int domain, int service, int protocol,
 		FD_SET((*it), &_master_set);
 	// Set timeout time for select; 3 mins in out case;
 	_timeout.tv_sec = 3 * 60;
-	// _timeout.tv_sec = 5;
 	_timeout.tv_usec = 0;
 }
 
@@ -49,6 +57,11 @@ ws::Server::~Server() {
 			prev_gen = it->second->getGeneration();
 			delete it->second;
 		}
+	}
+	std::vector<ConfigServer*>				vectServers = _config.getConfigServer();
+	std::vector<ConfigServer*>::iterator	itServ = vectServers.begin();
+		for (; itServ != vectServers.end(); ++itServ) {
+		delete *itServ;
 	}
 }
 
@@ -69,11 +82,10 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 	return (*this);
 }
 
-// Accept a connection on our socket and creates a new socket ft that is linked to the original one
-// Receive a message from the socket _sockfd
+// Accept an incoming connection on the listening socket
+// and create a new socket for that connection
 int		ws::Server::_accepter(int sockfd) {
-	std::cout << "Accepting" << std::endl;
-	// error check for nonexisten _socket[sockfd]?
+	// std::cout << "Accepting" << std::endl;
 	struct sockaddr_in	address = _socket[sockfd]->getAddress();
 	int	new_sd;
 	int	addrlen = sizeof(address);
@@ -84,9 +96,12 @@ int		ws::Server::_accepter(int sockfd) {
 	return new_sd;
 }
 
-// Print the received message
+// Read an incoming request on socket sockfd
+// Keep calling recv() until all content is read or there is an error/connection closed
+// Then parse the received request
+// Return error value or how many bytes were read in the last recv()
 int		ws::Server::_handler(int sockfd) {
-	std::cout << "Reading" << std::endl;
+	// std::cout << "Reading" << std::endl;
 	_buf.clear();
 	char	cbuf[BUFFER_SIZE];
 	ssize_t	bytesRead;
@@ -107,29 +122,29 @@ int		ws::Server::_handler(int sockfd) {
 			return -1;
 	} while (bytesRead == BUFFER_SIZE - 1);
 	if (_buf.size() > 0) {
-		// std::cout << _buf << std::endl;
 		Request req(_buf, _socketServer[sockfd]);
 		_req = req;
 	}
 	return bytesRead;
 }
 
-// Send a response back
+// Depending on the request's method and error status, send a proper response back
+// Return error status
 int		ws::Server::_responder(int sockfd) {
 	int			ret;
 	Response	response(_req);
 	std::string	toSend;
 
-	if (this->_req.getMethod() == "DELETE")
-	{
-		ret = this->_deleteFile(this->_req, sockfd);
-	}
-	else if (_req.getReturnStatus() >= 0)
+	if (_req.getReturnStatus() >= 0)
 	{
 		toSend = response.getResponse();
 		ret = send(sockfd, toSend.c_str(), toSend.size(), 0);
 	}
-	else if (_checkCgi(this->_req) && !(this->_req.getReturnStatus() >= 0))
+	else if (this->_req.getMethod() == "DELETE")
+	{
+		ret = this->_deleteFile(this->_req, sockfd);
+	}
+	else if (_checkCgi(this->_req))
 	{
 		CgiHandler cgi = CgiHandler(_req, sockfd);
 		ret = cgi.execute();
@@ -141,6 +156,7 @@ int		ws::Server::_responder(int sockfd) {
 	return ret;
 }
 
+// Check if socket sockfd is in the array of listening sockets
 bool	ws::Server::_checkSocket(int sockfd) {
 	std::vector<int>::iterator	it;
 
@@ -170,7 +186,7 @@ void	ws::Server::launcher() {
 			break ;
 		}
 		sds_ready = ret;
-		std::cout << "==== WAITING ====" << std::endl;
+		// std::cout << "==== WAITING ====" << std::endl;
 		for (int i = 0; i <= _max_sd && sds_ready > 0; ++i) {
 			// Check what descriptor (socket) is ready for connection
 			if (FD_ISSET(i, &_working_set)) {
@@ -189,8 +205,8 @@ void	ws::Server::launcher() {
 							}
 							break ;
 						}
-						std::cout << "max socket: " << _max_sd << std::endl;
-						std::cout << "server socket: " << new_sd << std::endl;
+						// std::cout << "max socket: " << _max_sd << std::endl;
+						// std::cout << "server socket: " << new_sd << std::endl;
 						// adding the new incoming connection to the master set
 						FD_SET(new_sd, &_master_set);
 						if (new_sd > _max_sd)
@@ -210,8 +226,6 @@ void	ws::Server::launcher() {
 							close_conn = true;
 							break ;
 						}
-						// else if (ret == -1)
-						// 	break ;
 						// send response back to the client
 						ret = _responder(i);
 						if (ret == -1) {
@@ -235,9 +249,9 @@ void	ws::Server::launcher() {
 				} // else
 			} // FD_ISSET
 		} // for loop to check every descriptor
-		std::cout << "==== DONE ====" << std::endl;
+		// std::cout << "==== DONE ====" << std::endl;
 	} // main loop begins
-	std::cout << "Closing fds" << std::endl;
+	// std::cout << "Closing fds" << std::endl;
 	for (int i = 0; i <= _max_sd; ++i) {
 		if (FD_ISSET(i, &_master_set))
 			close(i);

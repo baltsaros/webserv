@@ -20,8 +20,8 @@ class Configuration {
 		std::vector<std::string>	_configBlocks;
 
 
-		void	createConfigBlocks(std::string const & path);
-		void	parseConfig();
+		void						createConfigBlocks(std::string const & path);
+		void						parseConfig();
 
 		
 	public:

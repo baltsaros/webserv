@@ -15,7 +15,6 @@ Configuration::Configuration(Configuration const & src) {
 	*this = src;
 }
 Configuration::~Configuration() {
-	
 	this->_vectServers.clear();
 }
 
@@ -46,7 +45,7 @@ void	Configuration::createConfigBlocks(std::string const & path) {
 	ifs.open(path);
 	if (ifs.fail()) {
 		std::cout << "Error : nothing in the file\n";
-		exit(EXIT_FAILURE) ; // gestion d'erreur?
+		exit(EXIT_FAILURE) ;
 	}
 	std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 	while (posb != std::string::npos) {
@@ -61,10 +60,6 @@ void	Configuration::createConfigBlocks(std::string const & path) {
 			break ;
 	}
 	ifs.close();
-	// for (int i = 0; i < this->_vectBlocks.size(); i++) {
-	// 	std::cout << this->_vectBlocks[i];
-	// 	std::cout << "\n=====================\n";
-	// }
 }
 
 /*

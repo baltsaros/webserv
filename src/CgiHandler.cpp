@@ -167,7 +167,6 @@ int	ws::CgiHandler::execute(void)
 		waitpid(pid, &retPid, 0);
 		if (WIFEXITED(retPid) ) {
 			int es = WEXITSTATUS(retPid);
-			printf("Exit status was %d\n", es);
 			this->_req.setReturnStatus(500);
 			Response rep = Response(_req);
 			std::string toSend = rep.getResponse();
