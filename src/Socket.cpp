@@ -3,6 +3,16 @@
 // Constructors
 ws::Socket::Socket() {}
 
+// constructor takes the following parameters:
+// domain - what address family we use (IPv4 or IPv6 for example)
+// service - what socket type we use (SOCK_STREAM means two way connections, TCP socket)
+// protocol - what protocol to use with the socket; 0 is default value
+// interface - what IP addresses the socket should listen to; INADDR_ANY listens to all
+// IPv4 addresses, value is 0.0.0.0
+// backlog - specifies the maximum number of clients
+// that can be waiting to be served while the server is handling other connections
+// generation - tracks to what server block a socket belongs; required for proper
+// memory clean up
 ws::Socket::Socket(int domain, int service, int protocol, std::vector<int> ports,
 					u_long interface, int backlog, int generation) {
 	int	ret;
@@ -50,7 +60,7 @@ ws::Socket&	ws::Socket::operator=(Socket const &rhs) {
 	return (*this);
 }
 
-// Assigning _address to _sockfd and listen for new connections
+// Bind a socket to the netwok and turn it into a listening socket
 void	ws::Socket::connect_to_network(int sockfd) {
 	int	ret = 0;
 

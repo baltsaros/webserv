@@ -64,7 +64,7 @@ bool	ws::isDirectory(const std::string &path) {
 }
 
 /*
-** Remove all trail chars at the end.
+** Remove all similar trail characters at the end.
 ** @param std::string & str : The string to trim
 ** @param char trail : The char to remove
 ** @return No return
@@ -77,7 +77,7 @@ void	ws::trimTrailingChar(std::string &str, char trail) {
 }
 
 /*
-** Remove what after a trail.
+** Remove what goes after a trail (including the trail character).
 ** @param std::string & str : The string to operate
 ** @param char trail : the char where to start triming
 ** @return No return
@@ -90,7 +90,7 @@ void	ws::trimOneBlock(std::string &str, char trail) {
 }
 
 /*
-** Remove the root of target path if present.
+** Remove the root path from the target.
 ** @param const st::string & target : The target to trim
 ** @param const std::string & root : the path for root
 ** @return std::string : The new string trimmed.
@@ -109,8 +109,8 @@ std::string	ws::removeRootPath(const std::string &target, const std::string &roo
 ** Trim a string and return what's before the separator.
 ** @param std::String str : The string to trim.
 ** @param char separ : The separator to find.
-** @return std::string : The string trimmed of empty string
-		if separator is not found
+** @return std::string : The trimmed string or empty string
+						if separator was not found
 */
 std::string	ws::substrUntil(std::string str, char separ) {
 	size_t		pos = str.find_first_of(separ);

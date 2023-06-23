@@ -1,6 +1,10 @@
 #include "../inc/Request.hpp"
 
 ws::Request::Request() {_returnStatus = -1;}
+
+// Takes the following parameters:
+// buffer - request message
+// config - a server block associated with the incoming connection
 ws::Request::Request(const std::string &buffer, ConfigServer *config)
 		: _buffer(buffer), _config(config) {
 	_returnStatus = -1;
@@ -40,6 +44,9 @@ void	ws::Request::_checkPos(size_t pos) {
 		std::cerr << "Invalid character position" << std::endl;
 }
 
+// Get a certain parameter from the header:
+// toGet - what to retrieve
+// offset - a starting point
 std::string	ws::Request::_getParam(std::string toGet, size_t offset) {
 	size_t		end;
 	size_t		start;
@@ -51,6 +58,7 @@ std::string	ws::Request::_getParam(std::string toGet, size_t offset) {
 	return (param);
 }
 
+// Parse the request's message. Split it into header and body (they should be separated by crlf)
 void	ws::Request::readBuffer() {
 	size_t		crlf = 0;
 	size_t		pos;
@@ -108,9 +116,9 @@ void	ws::Request::readBuffer() {
 			this->_returnStatus = 501;
 			return ;
 		}
-	// get parameters from the starting line: method, taget and protocol version
 }
 
+// Check if target's path is correct
 void	ws::Request::_checkPath() {
 
 	std::map<std::string, ConfigLocation *>::iterator	tmp;
@@ -143,6 +151,7 @@ void	ws::Request::_checkPath() {
 	}
 }
 
+// Check if the request's method is correct
 bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
 	std::vector<std::string>::iterator	it = methods.begin();
 	std::vector<std::string>::iterator	itEnd = methods.end();
@@ -157,7 +166,8 @@ bool	ws::Request::_checkMethod(std::vector<std::string> methods) {
 	return false;
 }
 
-// need to check for errors
+// Parse the starting line
+// Find and save method, target and protocol version
 void	ws::Request::_parseStartingLine() {
 	size_t		pos;
 	size_t		start;
@@ -189,6 +199,7 @@ void	ws::Request::_parseStartingLine() {
 		_returnStatus = 400;
 }
 
+// Parse the rest of the request's header and save it into a map
 void	ws::Request::_parseHeaderFields() {
 	size_t								pos, pos1, pos2;
 	std::pair<std::string, std::string>	pair;
@@ -230,6 +241,7 @@ void	ws::Request::_parseGetTarget(void)
 	_queryString.erase(0, pos2 + 1);
 }
 
+// Find a proper location from the config that corresponds to the target
 std::map<std::string, ConfigLocation *>::iterator	ws::Request::_findLocation() {
 
 	std::string	target;

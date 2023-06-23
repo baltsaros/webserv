@@ -3,6 +3,15 @@
 // Constructors
 ws::Server::Server() {}
 
+// constructor takes the following parameters:
+// domain - what address family we use (IPv4 or IPv6 for example)
+// service - what socket type we use (SOCK_STREAM means two way connections, TCP socket)
+// protocol - what protocol to use with the socket; 0 is default value
+// interface - what IP addresses the socket should listen to; INADDR_ANY listens to all
+// IPv4 addresses, value is 0.0.0.0
+// backlog - specifies the maximum number of clients
+// that can be waiting to be served while the server is handling other connections
+// config - config parameters
 ws::Server::Server(int domain, int service, int protocol,
 					u_long interface, int backlog,
 					Configuration config) : _config(config) {
@@ -68,11 +77,10 @@ ws::Server&	ws::Server::operator=(Server const &rhs) {
 	return (*this);
 }
 
-// Accept a connection on our socket and creates a new socket ft that is linked to the original one
-// Receive a message from the socket _sockfd
+// Accept an incoming connection on the listening socket
+// and create a new socket for that connection
 int		ws::Server::_accepter(int sockfd) {
 	// std::cout << "Accepting" << std::endl;
-	// error check for nonexisten _socket[sockfd]?
 	struct sockaddr_in	address = _socket[sockfd]->getAddress();
 	int	new_sd;
 	int	addrlen = sizeof(address);
@@ -83,7 +91,10 @@ int		ws::Server::_accepter(int sockfd) {
 	return new_sd;
 }
 
-// Print the received message
+// Read an incoming request on socket sockfd
+// Keep calling recv() until all content is read or there is an error/connection closed
+// Then parse the received request
+// Return error value or how many bytes were read in the last recv()
 int		ws::Server::_handler(int sockfd) {
 	// std::cout << "Reading" << std::endl;
 	_buf.clear();
@@ -112,7 +123,8 @@ int		ws::Server::_handler(int sockfd) {
 	return bytesRead;
 }
 
-// Send a response back
+// Depending on the request's method and error status, send a proper response back
+// Return error status
 int		ws::Server::_responder(int sockfd) {
 	int			ret;
 	Response	response(_req);
@@ -139,6 +151,7 @@ int		ws::Server::_responder(int sockfd) {
 	return ret;
 }
 
+// Check if socket sockfd is in the array of listening sockets
 bool	ws::Server::_checkSocket(int sockfd) {
 	std::vector<int>::iterator	it;
 
