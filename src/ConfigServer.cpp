@@ -12,7 +12,10 @@ ConfigServer::ConfigServer(ConfigServer const & src) {
 }
 
 ConfigServer::~ConfigServer() {
-	
+	std::map<std::string, ConfigLocation*>::iterator	it = _mapLocations.begin();
+	for (; it != _mapLocations.end(); ++it) {
+		delete it->second;
+	}
 	this->_mapLocations.clear();
 }
 

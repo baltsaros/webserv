@@ -58,6 +58,11 @@ ws::Server::~Server() {
 			delete it->second;
 		}
 	}
+	std::vector<ConfigServer*>				vectServers = _config.getConfigServer();
+	std::vector<ConfigServer*>::iterator	itServ = vectServers.begin();
+		for (; itServ != vectServers.end(); ++itServ) {
+		delete *itServ;
+	}
 }
 
 ws::Server&	ws::Server::operator=(Server const &rhs) {
