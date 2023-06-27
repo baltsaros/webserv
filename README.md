@@ -75,11 +75,11 @@ This project is about creating an HTTP server. Nginx serves as a reference.
 
 
 # **Folders**
-***config** - contains config files
-***inc** - headers
-***src** - cpp files
-***unit-tests** - some basic Python tests
-***website** - content for the website
+* **config** - contains config files
+* **inc** - headers
+* **src** - cpp files
+* **unit-tests** - some basic Python tests
+* **website** - content for the website
 
 
 # **Useful resources**
